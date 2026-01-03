@@ -1,0 +1,22 @@
+name: attendance-management
+services:
+  - name: web
+    type: web
+    build:
+      type: docker
+      dockerfile: Dockerfile
+    instance_type: free
+    ports:
+      - port: 8080
+        protocol: http
+    env:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+    health_checks:
+      - http:
+          port: 8080
+          path: /
+    regions:
+      - was

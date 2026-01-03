@@ -1,16 +1,24 @@
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj files and restore
+# Copy solution file
+COPY ["attendenceProject.sln", "./"]
+
+# Copy all project files
 COPY ["attendenceProject/attendenceProject.csproj", "attendenceProject/"]
 COPY ["attendence.Domain/attendence.Domain.csproj", "attendence.Domain/"]
 COPY ["attendence.Data/attendence.Data.csproj", "attendence.Data/"]
 COPY ["attendence.Services/attendence.Services.csproj", "attendence.Services/"]
+COPY ["attendence.Tests/attendence.Tests.csproj", "attendence.Tests/"]
 
+# Restore dependencies
 RUN dotnet restore "attendenceProject/attendenceProject.csproj"
 
-# Copy everything else and build
+# Copy everything else
 COPY . .
+
+# Build
 WORKDIR "/src/attendenceProject"
 RUN dotnet build "attendenceProject.csproj" -c Release -o /app/build
 
