@@ -1,0 +1,68 @@
+@model attendenceProject.Pages.Admin.Sections.IndexModel
+
+<div class="max-w-2xl">
+    <form method="post" asp-page-handler="Add" class="space-y-6">
+        <input type="hidden" name="tab" value="add" />
+        
+        <!-- Badge Selection -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Badge <span class="text-red-500">*</span>
+            </label>
+            <select asp-for="BadgeId" required 
+                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white">
+                <option value="">Select Badge</option>
+                @foreach (var badge in Model.AllBadges)
+                {
+                    <option value="@badge.Id">@badge.Name</option>
+                }
+            </select>
+        </div>
+
+        <!-- Section Name -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Section Name <span class="text-red-500">*</span>
+            </label>
+            <input type="text" asp-for="SectionName" required maxlength="10"
+                   placeholder="e.g., A, B, C" 
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Enter section name (e.g., A, B, Morning, Evening)</p>
+        </div>
+
+        <!-- Semester -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Semester <span class="text-red-500">*</span>
+            </label>
+            <select asp-for="Semester" required 
+                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white">
+                <option value="">Select Semester</option>
+                @for (int i = 1; i <= 8; i++)
+                {
+                    <option value="@i">Semester @i</option>
+                }
+            </select>
+        </div>
+
+        <!-- Session -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Session <span class="text-red-500">*</span>
+            </label>
+            <input type="text" asp-for="Session" required maxlength="20"
+                   placeholder="e.g., 2023-2024" 
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Enter academic session (e.g., 2023-2024)</p>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" 
+                class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add Section
+        </button>
+    </form>
+</div>

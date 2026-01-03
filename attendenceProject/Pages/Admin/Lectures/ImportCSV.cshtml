@@ -1,0 +1,116 @@
+@page
+@model attendenceProject.Pages.Admin.Lectures.ImportCSVModel
+@{
+    ViewData["Title"] = "Import Lectures from CSV";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex items-center gap-4 mb-6">
+            <a href="/Admin/Lectures" class="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                ← Back to Lectures
+            </a>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Import Lectures from CSV</h1>
+        </div>
+
+        @if (!string.IsNullOrEmpty(TempData["Success"] as string))
+        {
+            <div class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 p-4 rounded-lg mb-6">
+                <p class="font-semibold">✓ @TempData["Success"]</p>
+            </div>
+        }
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-4 rounded-lg mb-6">
+                <p class="font-semibold mb-2">Please correct the following errors:</p>
+                <ul class="list-disc list-inside">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <!-- Step 1: Download Template -->
+        <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-600 p-6 rounded-lg mb-6">
+            <h2 class="text-lg font-bold text-blue-800 dark:text-blue-200 mb-3">📥 Step 1: Download CSV Template</h2>
+            <p class="text-blue-700 dark:text-blue-300 mb-4">Download a sample CSV template or generate one for a specific teacher</p>
+            <div class="flex gap-4">
+                <a href="/Admin/Lectures/ImportCSV?handler=DownloadTemplate" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+                    📄 Download Sample Template
+                </a>
+                <a href="/Admin/GenerateLectureCSV" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+                    🎯 Generate for Specific Teacher
+                </a>
+            </div>
+        </div>
+
+        <!-- Step 2: Upload CSV -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">📤 Step 2: Upload Your CSV File</h2>
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-6">
+                    <label for="csvFile" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Select CSV File <span class="text-red-500">*</span>
+                    </label>
+                    <input asp-for="CsvFile" type="file" accept=".csv" 
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" />
+                    <span asp-validation-for="CsvFile" class="text-red-500 text-sm"></span>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Only .csv files are accepted</p>
+                </div>
+
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+                        ✓ Upload and Import Lectures
+                    </button>
+                    <a href="/Admin/Lectures" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300 text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- CSV Format Guide -->
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
+            <h3 class="font-bold text-gray-800 dark:text-white mb-3">📋 CSV Format Requirements</h3>
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Your CSV file must have these columns in order:</p>
+            <div class="bg-white dark:bg-gray-700 p-4 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm overflow-x-auto">
+                <code>TimetableRuleId,Date,StartTime,EndTime,CourseCode,CourseName,Section,Badge,Room,LectureType,DayOfWeek,Status</code>
+            </div>
+            
+            <h4 class="font-bold text-gray-800 dark:text-white mt-4 mb-2">Column Descriptions:</h4>
+            <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300 text-sm">
+                <li><strong>TimetableRuleId:</strong> Required - ID of the timetable rule (from database)</li>
+                <li><strong>Date:</strong> Required - Format: YYYY-MM-DD (e.g., 2025-12-15)</li>
+                <li><strong>StartTime:</strong> Required - Format: HH:MM (e.g., 09:00)</li>
+                <li><strong>EndTime:</strong> Required - Format: HH:MM (e.g., 10:30)</li>
+                <li><strong>CourseCode:</strong> Info only - Not used for import</li>
+                <li><strong>CourseName:</strong> Info only - Not used for import</li>
+                <li><strong>Section:</strong> Info only - Not used for import</li>
+                <li><strong>Badge:</strong> Info only - Not used for import</li>
+                <li><strong>Room:</strong> Optional - Override room from timetable rule</li>
+                <li><strong>LectureType:</strong> Optional - Override lecture type</li>
+                <li><strong>DayOfWeek:</strong> Info only - Not used for import</li>
+                <li><strong>Status:</strong> Optional - Default is "Scheduled"</li>
+            </ul>
+        </div>
+
+        <!-- Example -->
+        <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-600 p-4 rounded-lg">
+            <h3 class="font-bold text-yellow-800 dark:text-yellow-200 mb-2">📝 Example CSV Row:</h3>
+            <div class="bg-white dark:bg-gray-700 p-3 rounded font-mono text-xs overflow-x-auto">
+                <code>5,2025-12-15,09:00,10:30,CS101,Programming,BSCS-A,BSCS,Room 301,Lecture,Mon,Scheduled</code>
+            </div>
+            <p class="text-yellow-700 dark:text-yellow-300 text-sm mt-2">
+                This creates a lecture on Dec 15, 2025 from 9:00 AM to 10:30 AM for timetable rule ID 5
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

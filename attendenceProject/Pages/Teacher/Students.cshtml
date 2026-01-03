@@ -1,0 +1,329 @@
+@page
+@model attendenceProject.Pages.Teacher.StudentsModel
+@{
+    ViewData["Title"] = "Students";
+}
+
+<div class="container mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-xl shadow-lg p-4 text-white">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-lg backdrop-blur-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Student Attendance</h1>
+                        <p class="text-white text-opacity-90 text-xs">View student attendance by selecting section and lecture</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 1: Section Selection -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4">
+        <div class="flex items-center gap-2 mb-3">
+            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-sm">1</span>
+            <h2 class="text-lg font-bold text-gray-800 dark:text-white">
+                Select Section
+            </h2>
+        </div>
+        
+        @if (Model.Sections.Any())
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                @foreach (var sec in Model.Sections)
+                {
+                    <a href="/Teacher/Students?sectionId=@sec.SectionId" 
+                       class="block bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-800 dark:hover:to-indigo-800 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-3 transition duration-300 @(Model.SelectedSectionId == sec.SectionId ? "ring-4 ring-blue-500 shadow-lg" : "")">
+                        <div class="font-bold text-base text-gray-800 dark:text-white">@sec.SectionName</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                            @sec.BadgeName - Semester @sec.Semester
+                        </div>
+                        <div class="flex justify-between items-center mt-2 text-xs">
+                            <span class="text-gray-600 dark:text-gray-400">
+                                <strong>@sec.StudentCount</strong> students
+                            </span>
+                            <span class="text-gray-600 dark:text-gray-400">
+                                @sec.Courses
+                            </span>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-gray-500 dark:text-gray-400 text-sm">No sections assigned yet.</p>
+        }
+    </div>
+
+    <!-- Step 3: Lecture Selection (Optional - for detailed view) -->
+    @if (Model.SelectedSectionId.HasValue && Model.Lectures.Any())
+    {
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500 text-white font-bold text-sm">3</span>
+                <h2 class="text-lg font-bold text-gray-800 dark:text-white">
+                    View Detailed Lecture Attendance (Optional)
+                </h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                @foreach (var lecture in Model.Lectures)
+                {
+                    var isSelected = Model.SelectedLectureId == lecture.LectureId;
+                    <a href="/Teacher/Students?sectionId=@Model.SelectedSectionId&lectureId=@lecture.LectureId" 
+                       class="block bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900 dark:to-purple-900 hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-800 dark:hover:to-purple-800 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-3 transition duration-300 @(isSelected ? "ring-4 ring-indigo-500 shadow-lg" : "")">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <div class="font-bold text-sm text-gray-800 dark:text-white">@lecture.CourseCode</div>
+                                <div class="text-xs text-gray-600 dark:text-gray-300 mt-0.5">@lecture.CourseName</div>
+                            </div>
+                            @if (lecture.AttendanceMarked)
+                            {
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    ✓ Marked
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                    Not Marked
+                                </span>
+                            }
+                        </div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
+                            <div>📅 @lecture.StartDateTime.ToString("MMM dd, yyyy")</div>
+                            <div>🕐 @lecture.StartDateTime.ToString("hh:mm tt")</div>
+                            <div>📍 @lecture.Room • @lecture.LectureType</div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+    
+    <!-- Section Students List (shown when section is selected) -->
+    @if (Model.SelectedSectionId.HasValue && Model.SectionStudents.Any())
+    {
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500 text-white font-bold text-sm">2</span>
+                <h2 class="text-lg font-bold text-gray-800 dark:text-white">
+                    Students in @Model.SelectedSectionName
+                </h2>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Roll No</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Father Name</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Lectures</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Present</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Absent</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Attendance %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach (var student in Model.SectionStudents)
+                        {
+                            var percentageColor = student.AttendancePercentage >= 75 ? "text-green-600 dark:text-green-400" :
+                                                 student.AttendancePercentage >= 50 ? "text-yellow-600 dark:text-yellow-400" :
+                                                 "text-red-600 dark:text-red-400";
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                    @student.RollNo
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                    @student.FullName
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                                    @student.FatherName
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-700 dark:text-gray-300">
+                                    @student.TotalLectures
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        @student.PresentCount
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                        @student.AbsentCount
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-center">
+                                    <span class="text-lg font-bold @percentageColor">
+                                        @student.AttendancePercentage%
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            @if (!Model.Lectures.Any())
+            {
+                <div class="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+                    <p>No completed lectures yet. Attendance percentages will be calculated once lectures are completed.</p>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Step 3: Student Attendance Details (Optional Detailed View) -->
+    @if (Model.SelectedLecture != null)
+    {
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3 rounded-t-lg">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-white bg-opacity-20 text-white font-bold text-sm">4</span>
+                    <h2 class="text-lg font-bold">
+                        Student Attendance Details
+                    </h2>
+                </div>
+                <div class="text-sm text-white text-opacity-90">
+                    <span class="font-semibold">@Model.SelectedLecture.CourseName</span> (@Model.SelectedLecture.CourseCode)
+                </div>
+                <div class="flex flex-wrap gap-4 mt-2 text-xs">
+                    <span>📚 @Model.SelectedLecture.SectionName - @Model.SelectedLecture.BadgeName</span>
+                    <span>📅 @Model.SelectedLecture.StartDateTime.ToString("MMM dd, yyyy")</span>
+                    <span>🕐 @Model.SelectedLecture.StartDateTime.ToString("hh:mm tt") - @Model.SelectedLecture.EndDateTime.ToString("hh:mm tt")</span>
+                    <span>📍 @Model.SelectedLecture.Room</span>
+                </div>
+            </div>
+            
+            <div class="p-4">
+                @if (Model.SelectedLecture.Students.Any())
+                {
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                        @{
+                            var totalStudents = Model.SelectedLecture.Students.Count;
+                            var presentCount = Model.SelectedLecture.Students.Count(s => s.Status == "Present");
+                            var absentCount = Model.SelectedLecture.Students.Count(s => s.Status == "Absent");
+                            var lateCount = Model.SelectedLecture.Students.Count(s => s.Status == "Late");
+                            var notMarkedCount = Model.SelectedLecture.Students.Count(s => s.Status == "Not Marked");
+                        }
+                        <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-bold text-blue-600 dark:text-blue-300">@totalStudents</div>
+                            <div class="text-xs text-blue-700 dark:text-blue-400 font-medium">Total Students</div>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-bold text-green-600 dark:text-green-300">@presentCount</div>
+                            <div class="text-xs text-green-700 dark:text-green-400 font-medium">Present</div>
+                        </div>
+                        <div class="bg-red-50 dark:bg-red-900 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-bold text-red-600 dark:text-red-300">@absentCount</div>
+                            <div class="text-xs text-red-700 dark:text-red-400 font-medium">Absent</div>
+                        </div>
+                        <div class="bg-yellow-50 dark:bg-yellow-900 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-bold text-yellow-600 dark:text-yellow-300">@lateCount</div>
+                            <div class="text-xs text-yellow-700 dark:text-yellow-400 font-medium">Late</div>
+                        </div>
+                    </div>
+
+                    <!-- Student Table -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Roll No</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Father Name</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Marked At</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach (var student in Model.SelectedLecture.Students)
+                                {
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                            @student.RollNo
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
+                                            @student.FullName
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                            @student.FatherName
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-center text-sm">
+                                            @{
+                                                var statusBadge = student.Status switch
+                                                {
+                                                    "Present" => "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+                                                    "Absent" => "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+                                                    "Late" => "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+                                                    "Excused" => "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+                                                    _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                                                };
+                                            }
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold @statusBadge">
+                                                @student.Status
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-center text-xs text-gray-700 dark:text-gray-300">
+                                            @if (student.MarkedAt.HasValue)
+                                            {
+                                                <span>@student.MarkedAt.Value.ToString("hh:mm tt")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-gray-400">-</span>
+                                            }
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                                            <a href="/Teacher/StudentProfile/@student.StudentId" 
+                                               class="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium text-sm">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                </svg>
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-12">
+                        <span class="text-6xl">📝</span>
+                        <p class="text-gray-500 dark:text-gray-400 text-lg mt-4">No students found in this section</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else if (Model.SelectedSectionId.HasValue && Model.Lectures.Any())
+    {
+        <div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-4 rounded">
+            <p class="text-blue-800 dark:text-blue-200 text-sm">
+                👆 <strong>Select a lecture above</strong> to view student attendance details for that specific lecture.
+            </p>
+        </div>
+    }
+    else if (!Model.SelectedSectionId.HasValue)
+    {
+        <div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-4 rounded">
+            <p class="text-blue-800 dark:text-blue-200 text-sm">
+                👆 <strong>Select a section above</strong> to begin viewing student attendance.
+            </p>
+        </div>
+    }
+</div>

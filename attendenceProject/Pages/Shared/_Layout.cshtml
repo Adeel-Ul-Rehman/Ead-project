@@ -1,0 +1,392 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - University Attendance System</title>
+    
+    <!-- jQuery (required for validation) -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="~/css/responsive.css" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#6366f1',
+                    },
+                    screens: {
+                        'xs': '475px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>        /* REMOVE ALL FOCUS RINGS AND BLUE BORDERS */
+        * {
+            outline: none !important;
+        }
+        *:focus, *:active, *:focus-visible, *:focus-within {
+            outline: none !important;
+            box-shadow: none !important;
+            --tw-ring-shadow: 0 0 #0000 !important;
+            --tw-ring-offset-shadow: 0 0 #0000 !important;
+        }
+        input:focus, select:focus, textarea:focus, button:focus, 
+        input:active, select:active, textarea:active, button:active,
+        input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            --tw-ring-shadow: 0 0 #0000 !important;
+            --tw-ring-offset-shadow: 0 0 #0000 !important;
+            --tw-ring-color: transparent !important;
+            --tw-ring-opacity: 0 !important;
+        }
+                @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .nav-menu {
+            display: none;
+        }
+        .nav-menu.active {
+            display: flex;
+        }
+        .nav-active {
+            background-color: #3b82f6 !important;
+            color: white !important;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+        .dark .nav-active {
+            background-color: #2563eb !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <!-- Top Navigation Bar -->
+        <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50">
+            <div class="px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo & Brand -->
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <a href="/" class="flex items-center gap-2 hover:opacity-80 transition">
+                            <span class="text-2xl sm:text-3xl">🎓</span>
+                            <span class="text-sm sm:text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hidden sm:inline whitespace-nowrap">
+                                Attendance
+                            </span>
+                        </a>
+                    </div>
+                    
+                    <!-- Desktop Navigation (Hidden on mobile/tablet) -->
+                    <div class="hidden lg:flex items-center gap-1 flex-wrap flex-shrink-0">
+                        @{
+                            var currentPath = Context.Request.Path.ToString();
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a href="/Admin/Dashboard" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Admin/Dashboard" || currentPath == "/Admin" ? "nav-active" : "")">
+                                Dashboard
+                            </a>
+                            <a href="/Admin/Courses" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Admin/Courses") ? "nav-active" : "")">
+                                Courses
+                            </a>
+                            <a href="/Admin/Teachers" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Admin/Teachers") ? "nav-active" : "")">
+                                Teachers
+                            </a>
+                            <a href="/Admin/Students" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Admin/Students") ? "nav-active" : "")">
+                                Students
+                            </a>
+                            <a href="/Admin/Schedule" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Admin/Schedule") || currentPath.StartsWith("/Admin/TimetableRules") || currentPath.StartsWith("/Admin/Holidays") ? "nav-active" : "")">
+                                Schedule
+                            </a>
+                            <a href="/Admin/AttendanceEditRequests" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Admin/AttendanceEditRequests") || currentPath.StartsWith("/Admin/ExtensionRequests") || currentPath.StartsWith("/Admin/Requests") ? "nav-active" : "")">
+                                Requests
+                            </a>
+                            <a href="/Admin/Reports" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Admin/Reports") ? "nav-active" : "")">
+                                Reports
+                            </a>
+                        }
+                        @if (User.IsInRole("Teacher"))
+                        {
+                            <a href="/Teacher/Dashboard" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Teacher/Dashboard" || currentPath == "/Teacher" ? "nav-active" : "")">
+                                Dashboard
+                            </a>
+                            <a href="/Teacher/Attendance" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Teacher/Attendance") ? "nav-active" : "")">
+                                Attendance
+                            </a>
+                            <a href="/Teacher/Requests/Extension" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Teacher/Requests") ? "nav-active" : "")">
+                                Requests
+                            </a>
+                            <a href="/Teacher/SpecialSessions" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath.StartsWith("/Teacher/SpecialSessions") ? "nav-active" : "")">
+                                Special Sessions
+                            </a>
+                            <a href="/Teacher/Timetable" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Teacher/Timetable" ? "nav-active" : "")">
+                                Timetable
+                            </a>
+                            <a href="/Teacher/Reports" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Teacher/Reports" ? "nav-active" : "")">
+                                Reports
+                            </a>
+                            <a href="/Teacher/Students" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Teacher/Students" ? "nav-active" : "")">
+                                Students
+                            </a>
+                        }
+                        @if (User.IsInRole("Student"))
+                        {
+                            <a href="/Student/Dashboard" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Student/Dashboard" || currentPath == "/Student" ? "nav-active" : "")">
+                                Dashboard
+                            </a>
+                            <a href="/Student/Timetable" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Student/Timetable" ? "nav-active" : "")">
+                                Timetable
+                            </a>
+                            <a href="/Student/Attendance" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Student/Attendance" ? "nav-active" : "")">
+                                Attendance
+                            </a>
+                            <a href="/Student/Courses" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Student/Courses" ? "nav-active" : "")">
+                                Courses
+                            </a>
+                            <a href="/Student/Holidays" class="nav-link px-2 py-2 text-xs md:text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition whitespace-nowrap @(currentPath == "/Student/Holidays" ? "nav-active" : "")">
+                                Holidays
+                            </a>
+                        }
+                    </div>
+
+                    <!-- Right Side: User Info & Menu Button -->
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <!-- User Info (Hidden on small screens) -->
+                        @if (User.IsInRole("Teacher"))
+                        {
+                            <a href="/Teacher/Account" class="hidden sm:flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs md:text-sm whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                                <span class="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[100px] md:max-w-none">@User.Identity?.Name</span>
+                                <span class="bg-blue-500 text-white text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0">T</span>
+                            </a>
+                        }
+                        else if (User.IsInRole("Admin"))
+                        {
+                            <a href="/Admin/Account" class="hidden sm:flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs md:text-sm whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                                <span class="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[100px] md:max-w-none">@User.Identity?.Name</span>
+                                <span class="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0">A</span>
+                            </a>
+                        }
+                        else if (User.IsInRole("Student"))
+                        {
+                            <a href="/Student/Account" class="hidden sm:flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs md:text-sm whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                                <span class="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[100px] md:max-w-none">@User.Identity?.Name</span>
+                                <span class="bg-green-500 text-white text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0">S</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="hidden sm:flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs md:text-sm whitespace-nowrap">
+                                <span class="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[100px] md:max-w-none">@User.Identity?.Name</span>
+                            </div>
+                        }
+
+                        <!-- Logout Button -->
+                        <form id="logoutForm" method="post" asp-page="/Account/Logout" class="inline">
+                            @Html.AntiForgeryToken()
+                            <button type="button" onclick="showLogoutConfirmation()" class="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white px-2 md:px-3 py-2 rounded text-xs md:text-sm font-medium transition whitespace-nowrap">
+                                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                <span class="hidden md:inline ml-1">Logout</span>
+                            </button>
+                        </form>
+
+                        <!-- Mobile Menu Button -->
+                        <button onclick="toggleMenu()" class="lg:hidden flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded transition">
+                            <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                            <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile/Tablet Navigation Menu -->
+                <div id="navMenu" class="nav-menu flex-col lg:hidden hidden pb-4 gap-1">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a href="/Admin/Dashboard" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📊 Dashboard
+                        </a>
+                        <a href="/Admin/Courses" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📚 Courses
+                        </a>
+                        <a href="/Admin/Teachers" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            👨‍🏫 Teachers
+                        </a>
+                        <a href="/Admin/Students" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            👥 Students
+                        </a>
+                        <a href="/Admin/Schedule" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📅 Schedule
+                        </a>
+                        <a href="/Admin/AttendanceEditRequests" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📋 Requests
+                        </a>
+                        <a href="/Admin/Reports" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📊 Reports
+                        </a>
+                    }
+                    @if (User.IsInRole("Teacher"))
+                    {
+                        <a href="/Teacher/Dashboard" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📊 Dashboard
+                        </a>
+                        <a href="/Teacher/Attendance" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            ✅ Attendance
+                        </a>
+                        <a href="/Teacher/Requests/Extension" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📝 Requests
+                        </a>
+                        <a href="/Teacher/Timetable" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📅 Timetable
+                        </a>
+                        <a href="/Teacher/Reports" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📊 Reports
+                        </a>
+                        <a href="/Teacher/Students" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            👥 Students
+                        </a>
+                        <a href="/Teacher/Account" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            ⚙️ Account Settings
+                        </a>
+                    }
+                    @if (User.IsInRole("Student"))
+                    {
+                        <a href="/Student/Dashboard" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📊 Dashboard
+                        </a>
+                        <a href="/Student/Timetable" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📅 Timetable
+                        </a>
+                        <a href="/Student/Attendance" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            ✅ Attendance
+                        </a>
+                        <a href="/Student/Courses" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            📚 Courses
+                        </a>
+                        <a href="/Student/Holidays" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            🎉 Holidays
+                        </a>
+                        <a href="/Student/Account" class="block px-4 py-2 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                            ⚙️ Account Settings
+                        </a>
+                    }
+                </div>
+            </div>
+        </nav>
+    }
+
+    <!-- Main Content -->
+    <main class="@(User.Identity?.IsAuthenticated == true ? "flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 fade-in" : "flex-1")">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 mt-auto border-t border-gray-200 dark:border-gray-700">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs sm:text-sm">
+                <p class="text-gray-600 dark:text-gray-400">
+                    &copy; 2025 University Attendance Management System. All rights reserved.
+                </p>
+                <div class="flex gap-3 text-gray-500 dark:text-gray-400">
+                    <a href="#" class="hover:text-blue-600 dark:hover:text-blue-400">Privacy</a>
+                    <span>•</span>
+                    <a href="#" class="hover:text-blue-600 dark:hover:text-blue-400">Terms</a>
+                    <span>•</span>
+                    <a href="#" class="hover:text-blue-600 dark:hover:text-blue-400">Help</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" onclick="hideLogoutConfirmation(event)">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4 transform transition-all" onclick="event.stopPropagation()">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Confirm Logout</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Are you sure you want to logout?</p>
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end mt-6">
+                <button onclick="hideLogoutConfirmation()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
+                    Cancel
+                </button>
+                <button onclick="confirmLogout()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition font-medium">
+                    Yes, Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLogoutConfirmation() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function hideLogoutConfirmation(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('logoutModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmLogout() {
+            document.getElementById('logoutForm').submit();
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                hideLogoutConfirmation();
+            }
+        });
+
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            const menuIcon = document.getElementById('menuIcon');
+            const closeIcon = document.getElementById('closeIcon');
+            
+            menu.classList.toggle('active');
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        }
+
+        // Close menu when a link is clicked
+        document.querySelectorAll('#navMenu a').forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+    </script>
+
+    <!-- AJAX Forms Handler -->
+    <script src="~/js/ajax-forms.js"></script>
+
+    <!-- Pagination Manager -->
+    <script src="~/js/pagination.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

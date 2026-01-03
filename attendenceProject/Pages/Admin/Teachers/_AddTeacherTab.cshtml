@@ -1,0 +1,131 @@
+@model attendenceProject.Pages.Admin.Teachers.IndexModel
+
+<div class="max-w-2xl mx-auto">
+    <div class="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Add New Teacher</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Fill in the details below to add a new teacher. Login credentials will be automatically generated and sent via email.</p>
+    </div>
+
+    <form method="post" asp-page-handler="AddTeacher" class="space-y-6">
+        @Html.AntiForgeryToken()
+
+        <!-- Full Name -->
+        <div>
+            <label asp-for="NewTeacher.FullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Full Name <span class="text-red-500">*</span>
+            </label>
+            <input asp-for="NewTeacher.FullName" 
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                   placeholder="e.g., Dr. Ahmed Khan"
+                   required />
+            <span asp-validation-for="NewTeacher.FullName" class="text-red-500 text-sm"></span>
+        </div>
+
+        <!-- Email -->
+        <div>
+            <label asp-for="NewTeacher.Email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Email Address <span class="text-red-500">*</span>
+            </label>
+            <input asp-for="NewTeacher.Email" type="email"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                   placeholder="e.g., ahmed.khan@university.edu"
+                   required />
+            <span asp-validation-for="NewTeacher.Email" class="text-red-500 text-sm"></span>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Login credentials will be sent to this email</p>
+        </div>
+
+        <!-- Badge Number -->
+        <div>
+            <label asp-for="NewTeacher.BadgeNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Badge Number <span class="text-red-500">*</span>
+            </label>
+            <input asp-for="NewTeacher.BadgeNumber" 
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                   placeholder="e.g., T-2024-001"
+                   required />
+            <span asp-validation-for="NewTeacher.BadgeNumber" class="text-red-500 text-sm"></span>
+        </div>
+
+        <!-- Designation -->
+        <div>
+            <label asp-for="NewTeacher.Designation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Designation <span class="text-red-500">*</span>
+            </label>
+            <select asp-for="NewTeacher.Designation" 
+                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    required>
+                <option value="">Select Designation</option>
+                <option value="Professor">Professor</option>
+                <option value="Associate Professor">Associate Professor</option>
+                <option value="Assistant Professor">Assistant Professor</option>
+                <option value="Lecturer">Lecturer</option>
+                <option value="Senior Lecturer">Senior Lecturer</option>
+                <option value="Visiting Faculty">Visiting Faculty</option>
+            </select>
+            <span asp-validation-for="NewTeacher.Designation" class="text-red-500 text-sm"></span>
+        </div>
+
+        <!-- Info Box -->
+        <div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-4 rounded">
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-blue-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <p class="text-sm font-medium text-blue-800 dark:text-blue-200">Automatic Credential Generation</p>
+                    <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                        A secure password will be automatically generated and sent to the teacher's email address along with login instructions.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4 pt-4">
+            <button type="submit" class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Add Teacher
+            </button>
+            <a href="/Admin/Teachers?tab=all" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 text-center">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+    <!-- Quick Tips -->
+    <div class="mt-8 border-t border-gray-200 dark:border-gray-600 pt-6">
+        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">💡 Quick Tips</h4>
+        <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li class="flex items-start">
+                <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Use official university email addresses for better communication
+            </li>
+            <li class="flex items-start">
+                <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Badge numbers should follow your university's format (e.g., T-2024-001)
+            </li>
+            <li class="flex items-start">
+                <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                After adding, assign courses to the teacher using the "Assign Courses" tab
+            </li>
+            <li class="flex items-start">
+                <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                For bulk additions, use the "Import Teachers" tab with a CSV file
+            </li>
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,64 @@
+@page
+@model attendenceProject.Pages.Admin.Holidays.EditModel
+@{
+    ViewData["Title"] = "Edit Holiday";
+}
+
+<!-- Header Section -->
+<div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2 sm:gap-3">
+        <span class="text-3xl sm:text-4xl md:text-5xl">✏️</span>
+        <span>Edit Holiday</span>
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2 text-base sm:text-lg">Update holiday information</p>
+</div>
+
+<!-- Form Card -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 md:p-8 max-w-2xl">
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Input.Id" />
+        
+        <div class="space-y-6">
+            <!-- Date -->
+            <div>
+                <label asp-for="Input.Date" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Date <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="Input.Date" type="date" required
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                <span asp-validation-for="Input.Date" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Reason -->
+            <div>
+                <label asp-for="Input.Reason" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Reason <span class="text-red-500">*</span>
+                </label>
+                <textarea asp-for="Input.Reason" required rows="3"
+                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                          placeholder="e.g., Eid Holidays, Winter Break, National Holiday"></textarea>
+                <span asp-validation-for="Input.Reason" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Validation Summary -->
+            <div asp-validation-summary="All" class="text-red-500 text-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-3"></div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Update Holiday
+                </button>
+                <a href="/Admin/Holidays" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

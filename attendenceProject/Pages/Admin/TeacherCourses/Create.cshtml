@@ -1,0 +1,151 @@
+@page
+@model attendenceProject.Pages.Admin.TeacherCourses.CreateModel
+@{
+    ViewData["Title"] = "New Course Assignment";
+}
+
+<!-- Header Section -->
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+        <span class="text-5xl">➕</span>
+        <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">New Course Assignment</span>
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">Assign a teacher to teach a course for a specific section</p>
+</div>
+
+<!-- Info Card -->
+<div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 border-l-4 border-blue-500 p-6 rounded-xl shadow-lg mb-8">
+    <div class="flex items-start">
+        <div class="flex-shrink-0">
+            <svg class="w-7 h-7 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <div class="ml-4">
+            <h4 class="text-lg font-bold text-blue-900 dark:text-blue-200 mb-3">How to Create an Assignment</h4>
+            <ul class="text-sm text-blue-800 dark:text-blue-300 space-y-2">
+                <li class="flex items-start">
+                    <span class="mr-2 mt-0.5 text-blue-600 dark:text-blue-400">1.</span>
+                    <span><strong>Select a Section:</strong> Choose the department, semester, and section name where this course will be taught</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-2 mt-0.5 text-blue-600 dark:text-blue-400">2.</span>
+                    <span><strong>Pick a Course:</strong> Select the course (theory or lab) to be taught in that section</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-2 mt-0.5 text-blue-600 dark:text-blue-400">3.</span>
+                    <span><strong>Choose a Teacher:</strong> Assign the teacher who will teach this course</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-2 mt-0.5 text-blue-600 dark:text-blue-400">4.</span>
+                    <span>The system will create the connection and track attendance for this assignment</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Form Card -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8">
+    <form method="post">
+        @Html.AntiForgeryToken()
+        
+        <div class="space-y-6">
+            <!-- Section Selection -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <label asp-for="Input.SectionId" class="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <span>Section</span>
+                    <span class="text-red-500 text-xl">*</span>
+                </label>
+                <select asp-for="Input.SectionId" required id="sectionSelect"
+                        class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all duration-200 text-base">
+                    <option value="">-- Select Section --</option>
+                    @foreach (var sec in Model.AllSections)
+                    {
+                        <option value="@sec.Id">
+                            @sec.Badge.Name - Semester @sec.Semester - @sec.Name (@sec.Session)
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Input.SectionId" class="text-red-500 text-sm mt-1 block"></span>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Choose the class section where this course will be taught</p>
+            </div>
+
+            <!-- Course Selection -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <label asp-for="Input.CourseId" class="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-3">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    <span>Course</span>
+                    <span class="text-red-500 text-xl">*</span>
+                </label>
+                <select asp-for="Input.CourseId" required id="courseSelect"
+                        class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-800 dark:text-white transition-all duration-200 text-base">
+                    <option value="">-- Select Course --</option>
+                    @foreach (var course in Model.AllCourses)
+                    {
+                        <option value="@course.Id">
+                            @course.Code - @course.Title (@(course.IsLab ? "Lab" : "Theory")) - @course.CreditHours CH
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Input.CourseId" class="text-red-500 text-sm mt-1 block"></span>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Select the course to be taught</p>
+            </div>
+
+            <!-- Teacher Selection -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <label asp-for="Input.TeacherId" class="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span>Teacher</span>
+                    <span class="text-red-500 text-xl">*</span>
+                </label>
+                <select asp-for="Input.TeacherId" required id="teacherSelect"
+                        class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-800 dark:text-white transition-all duration-200 text-base">
+                    <option value="">-- Select Teacher --</option>
+                    @foreach (var teacher in Model.AllTeachers)
+                    {
+                        <option value="@teacher.Id">
+                            @teacher.User.FullName
+                            @if (!string.IsNullOrEmpty(teacher.Designation))
+                            {
+                                <span>(@teacher.Designation)</span>
+                            }
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Input.TeacherId" class="text-red-500 text-sm mt-1 block"></span>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Choose the teacher who will teach this course</p>
+            </div>
+
+            <!-- Validation Summary -->
+            <div asp-validation-summary="All" class="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900 border-l-4 border-red-500 rounded-lg p-4"></div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 text-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Create Assignment
+                </button>
+                <a href="/Admin/TeacherCourses" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

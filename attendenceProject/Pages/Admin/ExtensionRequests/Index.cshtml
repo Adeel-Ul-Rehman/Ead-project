@@ -1,0 +1,67 @@
+@page
+@model attendenceProject.Pages.Admin.ExtensionRequests.IndexModel
+@{
+    ViewData["Title"] = "Redirecting...";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+    <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 text-center">
+        <div class="mb-6">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3">
+                Page Moved
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">
+                Extension Requests and Edit Requests have been unified into a single management area for better efficiency.
+            </p>
+        </div>
+        
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 border-l-4 border-blue-500 p-4 rounded-lg mb-6 text-left">
+            <p class="text-sm text-blue-800 dark:text-blue-200">
+                <strong class="font-semibold">✨ New Feature:</strong> Both Extension Requests and Edit Requests are now managed together in the <strong>Attendance Requests</strong> area.
+            </p>
+        </div>
+
+        <a href="/Admin/AttendanceEditRequests" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <span>Go to Attendance Requests</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+            </svg>
+        </a>
+
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-6">
+            You will be automatically redirected in <span id="countdown" class="font-bold text-indigo-600 dark:text-indigo-400">5</span> seconds...
+        </p>
+    </div>
+</div>
+
+<script>
+    // Auto-redirect after 5 seconds
+    let count = 5;
+    const countdownElement = document.getElementById('countdown');
+    
+    const interval = setInterval(() => {
+        count--;
+        countdownElement.textContent = count;
+        
+        if (count <= 0) {
+            clearInterval(interval);
+            window.location.href = '/Admin/AttendanceEditRequests';
+        }
+    }, 1000);
+</script>
+
+<style>
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    .animate-pulse {
+        animation: pulse 2s ease-in-out infinite;
+    }
+</style>

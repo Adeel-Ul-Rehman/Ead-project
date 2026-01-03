@@ -1,0 +1,145 @@
+@page
+@model attendenceProject.Pages.Teacher.DebugModel
+@{
+    ViewData["Title"] = "Teacher Debug Info";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Teacher Debug Information</h1>
+
+    <div class="bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Debug Messages</h2>
+        <p><strong>Current Time:</strong> @Model.CurrentTime</p>
+        <p><strong>Today:</strong> @Model.TodayDayOfWeek</p>
+        <div class="mt-4">
+            @foreach (var msg in Model.DebugMessages)
+            {
+                <p class="text-sm">✓ @msg</p>
+            }
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Basic Info</h2>
+        <p><strong>User ID:</strong> @Model.UserId</p>
+        <p><strong>Teacher ID:</strong> @Model.TeacherId</p>
+        <p><strong>Teacher Name:</strong> @Model.TeacherName</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Teacher Courses (@Model.TeacherCourses.Count)</h2>
+        @if (Model.TeacherCourses.Any())
+        {
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100 dark:bg-gray-700">
+                        <th class="px-4 py-2">ID</th>
+                        <th class="px-4 py-2">Course</th>
+                        <th class="px-4 py-2">Section</th>
+                        <th class="px-4 py-2">Badge</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tc in Model.TeacherCourses)
+                    {
+                        <tr class="border-b">
+                            <td class="px-4 py-2">@tc.Id</td>
+                            <td class="px-4 py-2">@tc.CourseName (@tc.CourseCode)</td>
+                            <td class="px-4 py-2">@tc.SectionName - Sem @tc.Semester</td>
+                            <td class="px-4 py-2">@tc.BadgeName</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-red-600 font-bold">❌ NO TEACHER COURSES FOUND!</p>
+            <p class="text-sm mt-2">Admin must assign you to courses via Admin → Teacher Courses → Create</p>
+        }
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Timetable Rules (@Model.TimetableRules.Count)</h2>
+        @if (Model.TimetableRules.Any())
+        {
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100 dark:bg-gray-700">
+                        <th class="px-4 py-2">ID</th>
+                        <th class="px-4 py-2">Course</th>
+                        <th class="px-4 py-2">Days</th>
+                        <th class="px-4 py-2">Time</th>
+                        <th class="px-4 py-2">Room</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rule in Model.TimetableRules)
+                    {
+                        <tr class="border-b">
+                            <td class="px-4 py-2">@rule.Id</td>
+                            <td class="px-4 py-2">@rule.CourseName</td>
+                            <td class="px-4 py-2">@rule.Days</td>
+                            <td class="px-4 py-2">@rule.Time</td>
+                            <td class="px-4 py-2">@rule.Room</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-red-600 font-bold">❌ NO TIMETABLE RULES FOUND!</p>
+            <p class="text-sm mt-2">Admin must create timetable rules via Admin → Timetable Rules → Create</p>
+        }
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Lectures (@Model.Lectures.Count)</h2>
+        @if (Model.Lectures.Any())
+        {
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100 dark:bg-gray-700">
+                        <th class="px-4 py-2">ID</th>
+                        <th class="px-4 py-2">Course</th>
+                        <th class="px-4 py-2">Section</th>
+                        <th class="px-4 py-2">Date/Time</th>
+                        <th class="px-4 py-2">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var lec in Model.Lectures.Take(20))
+                    {
+                        <tr class="border-b">
+                            <td class="px-4 py-2">@lec.Id</td>
+                            <td class="px-4 py-2">@lec.CourseName</td>
+                            <td class="px-4 py-2">@lec.SectionName</td>
+                            <td class="px-4 py-2">@lec.DateTime</td>
+                            <td class="px-4 py-2">
+                                <span class="px-2 py-1 text-xs rounded @(lec.Status == "Completed" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800")">
+                                    @lec.Status
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-yellow-600 font-bold">ℹ️ No lecture records in database yet</p>
+            <p class="text-sm mt-2">Lecture records are created automatically when you mark attendance for the first time.</p>
+        }
+    </div>
+
+    <div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-4">
+        <h3 class="font-bold text-blue-800 dark:text-blue-200">How It Works:</h3>
+        <ol class="list-decimal ml-6 mt-2 text-sm">
+            <li>Admin creates <strong>Teacher Courses</strong> (assigns you to courses and sections)</li>
+            <li>Admin creates <strong>Timetable Rules</strong> (defines when lectures happen)</li>
+            <li>Lectures automatically appear on your dashboard based on timetable rules</li>
+            <li>When you mark attendance, a lecture record is created automatically</li>
+        </ol>
+    </div>
+</div>

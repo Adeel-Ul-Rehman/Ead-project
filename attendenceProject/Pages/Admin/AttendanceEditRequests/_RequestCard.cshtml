@@ -1,0 +1,92 @@
+@model attendenceProject.Pages.Admin.AttendanceEditRequests.IndexModel.UnifiedRequestViewModel
+
+@{
+    var isEditRequest = Model.RequestType == "edit";
+    var isExtensionRequest = Model.RequestType == "extension";
+    var borderColor = Model.Status == "Pending" ? "border-l-yellow-500" :
+                     Model.Status == "Approved" ? "border-l-green-500" :
+                     Model.Status == "Rejected" ? "border-l-red-500" :
+                     "border-l-gray-500";
+    
+    var bgColor = Model.Status == "Pending" ? "hover:bg-yellow-50 dark:hover:bg-yellow-900/10" :
+                  Model.Status == "Approved" ? "hover:bg-green-50 dark:hover:bg-green-900/10" :
+                  Model.Status == "Rejected" ? "hover:bg-red-50 dark:hover:bg-red-900/10" :
+                  "hover:bg-gray-50 dark:hover:bg-gray-900/10";
+    
+    var requestTypeBadgeColor = isEditRequest ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" : 
+                                               "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+    var requestTypeIcon = isEditRequest ? "✏️" : "🔄";
+}
+
+<!-- Compact Thin Horizontal Card -->
+<div class="border-l-4 @borderColor bg-white dark:bg-gray-800 rounded-lg @bgColor transition-all duration-200 hover:shadow-md">
+    <div class="px-4 py-3 flex items-center justify-between gap-4">
+        <!-- Left: Type Badge + Basic Info -->
+        <div class="flex items-center gap-4 min-w-0 flex-1">
+            <!-- Request Type Badge -->
+            <span class="@requestTypeBadgeColor px-2.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap">
+                @requestTypeIcon @(isEditRequest ? "Edit" : "Ext")
+            </span>
+
+            <!-- Teacher Name -->
+            <div class="min-w-0 flex-1">
+                <div class="font-semibold text-gray-900 dark:text-white truncate">@Model.TeacherName</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 truncate">@Model.TeacherEmail</div>
+            </div>
+        </div>
+
+        <!-- Center: Course & Section Info (Thin columns) -->
+        <div class="hidden md:flex items-center gap-3 text-sm">
+            <div class="text-gray-700 dark:text-gray-300 truncate max-w-xs">
+                <span class="font-medium">📚</span> @Model.CourseName
+            </div>
+            <div class="text-gray-700 dark:text-gray-300 truncate max-w-xs">
+                <span class="font-medium">👥</span> @Model.SectionName
+            </div>
+            <div class="text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                <span class="font-medium">📅</span> @Model.LectureDate.ToString("MMM dd, yyyy")
+            </div>
+        </div>
+
+        <!-- Status Badge -->
+        <div class="flex items-center gap-2">
+            @if (Model.Status == "Pending" && isExtensionRequest && Model.HoursRemaining > 0)
+            {
+                <span class="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 px-2 py-1 rounded-md text-xs font-bold whitespace-nowrap">
+                    ⏰ @Model.HoursRemaining hrs
+                </span>
+            }
+            <span class="@(Model.Status == "Pending" ? "bg-yellow-500" : 
+                           Model.Status == "Approved" ? "bg-green-500" : 
+                           Model.Status == "Rejected" ? "bg-red-500" :
+                           "bg-gray-500") text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap">
+                @(Model.Status == "Pending" ? "⏳" : Model.Status == "Approved" ? "✅" : Model.Status == "Rejected" ? "❌" : "📋") @Model.Status
+            </span>
+        </div>
+
+        <!-- Right: Action Button -->
+        <div class="flex items-center gap-2">
+            @if (Model.Status == "Pending")
+            {
+                <button onclick="openReviewModal(@Model.Id, '@Model.RequestType', '@Html.Raw(Model.TeacherName.Replace("'", "\\'"))', '@Html.Raw((Model.CourseName + " - " + Model.CourseTitle).Replace("'", "\\'"))', '@Html.Raw((Model.SectionName + " (" + Model.BadgeName + ")").Replace("'", "\\'"))', '@Model.LectureDate.ToString("dddd, MMMM dd, yyyy")', '@Html.Raw(Model.Reason.Replace("'", "\\'").Replace("\n", "\\n").Replace("\r", ""))', '@(isExtensionRequest ? Model.ExtensionRequestType : "")')"
+                        class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold px-4 py-2 rounded-lg transition duration-200 shadow-sm text-sm whitespace-nowrap">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    Review
+                </button>
+            }
+            else
+            {
+                <button onclick="openDetailsModal('@Html.Raw(Model.TeacherName.Replace("'", "\\'"))', '@Html.Raw((Model.CourseName + " - " + Model.CourseTitle).Replace("'", "\\'"))', '@Html.Raw((Model.SectionName + " (" + Model.BadgeName + ")").Replace("'", "\\'"))', '@Model.LectureDate.ToString("dddd, MMMM dd, yyyy")', '@Html.Raw(Model.Reason.Replace("'", "\\'").Replace("\n", "\\n").Replace("\r", ""))', '@Model.Status', '@Html.Raw((Model.ProcessedByName ?? "System").Replace("'", "\\'"))', '@(Model.ProcessedAt?.ToString("MMM dd, yyyy hh:mm tt") ?? "")', '@Html.Raw((Model.AdminNotes ?? "").Replace("'", "\\'").Replace("\n", "\\n").Replace("\r", ""))', '@Model.RequestType', '@(isExtensionRequest ? Model.ExtensionRequestType : "")', '@(Model.ExtendsUntil?.ToString("MMM dd, yyyy hh:mm tt") ?? "")')"
+                        class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white font-semibold px-4 py-2 rounded-lg transition duration-200 shadow-sm text-sm whitespace-nowrap">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    View Details
+                </button>
+            }
+        </div>
+    </div>
+</div>

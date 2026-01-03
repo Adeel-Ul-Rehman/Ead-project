@@ -1,0 +1,95 @@
+@page
+@model attendenceProject.Pages.Admin.TestEmailModel
+@{
+    ViewData["Title"] = "Test Email Service";
+}
+
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-4xl">📧</span>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Test Email Service</h1>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="mb-6 p-4 rounded-lg @(Model.IsSuccess ? "bg-green-50 border-l-4 border-green-500" : "bg-red-50 border-l-4 border-red-500")">
+                <p class="@(Model.IsSuccess ? "text-green-800" : "text-red-800")">
+                    @Model.Message
+                </p>
+            </div>
+        }
+
+        <form method="post" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    📧 Test Email Address
+                </label>
+                <input type="email" 
+                       asp-for="TestEmail" 
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                       placeholder="your-email@example.com"
+                       required />
+                <p class="mt-1 text-sm text-gray-500">Enter your email to receive a test credentials email</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    👤 Test Name
+                </label>
+                <input type="text" 
+                       asp-for="TestName" 
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                       placeholder="John Doe"
+                       required />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    🎭 Role
+                </label>
+                <select asp-for="TestRole" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                    <option value="Student">Student</option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" 
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition transform hover:scale-105 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Send Test Email
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-8 p-6 bg-blue-50 dark:bg-gray-700 rounded-lg">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">ℹ️ Setup Instructions:</h2>
+            <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <li>Make sure you've enabled <strong>2-Step Verification</strong> in your Gmail account</li>
+                <li>Create an <strong>App Password</strong> in Google Account settings</li>
+                <li>Update <code class="bg-white dark:bg-gray-800 px-2 py-1 rounded">appsettings.json</code> with:
+                    <ul class="list-disc list-inside ml-6 mt-2">
+                        <li>SenderEmail: Your Gmail address</li>
+                        <li>Username: Your Gmail address</li>
+                        <li>Password: The 16-character app password</li>
+                    </ul>
+                </li>
+                <li>Click "Send Test Email" to verify the setup</li>
+            </ol>
+        </div>
+
+        <div class="mt-6">
+            <a href="/Admin/Dashboard" class="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,337 @@
+@page
+@model attendenceProject.Pages.Teacher.ReportsModel
+@{
+    ViewData["Title"] = "Reports & Statistics";
+}
+
+<!-- Header Section -->
+<div class="mb-6">
+    <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl shadow-lg p-4 text-white">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-white bg-opacity-20 p-2 rounded-lg backdrop-blur-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Reports & Statistics</h1>
+                    <p class="text-white text-opacity-90 text-xs">View attendance analytics and insights</p>
+                </div>
+            </div>
+            @if (Model.CourseStatistics.Any())
+            {
+                <a href="?handler=ExportToExcel" 
+                   class="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-sm text-white font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export to Excel
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.CourseStatistics.Any())
+{
+    <!-- Overview Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+        <!-- Attendance Trend Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    Course Attendance Overview
+                </h2>
+            </div>
+            <div class="p-4">
+                @if (Model.CourseStatistics.Any())
+                {
+                    <div class="space-y-4">
+                        @foreach (var course in Model.CourseStatistics)
+                        {
+                            var percentage = course.AttendancePercentage;
+                            var barColor = percentage >= 75 ? "bg-green-500" : percentage >= 50 ? "bg-yellow-500" : "bg-red-500";
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-[200px]" title="@course.CourseName (@course.SectionName)">
+                                    @course.CourseName (@course.SectionName)
+                                </span>
+                                <span class="text-sm font-bold text-gray-900 dark:text-white">@percentage.ToString("F1")%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                <div class="@barColor h-3 rounded-full transition-all duration-500" style="width: @percentage%"></div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-8">
+                        <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">No attendance data available</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Status Distribution Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-3">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                    </svg>
+                    Attendance Status Distribution
+                </h2>
+            </div>
+            <div class="p-4">
+                @if (Model.CourseStatistics.Any())
+                {
+                    var totalPresent = Model.CourseStatistics.Sum(c => c.TotalPresent);
+                    var totalAbsent = Model.CourseStatistics.Sum(c => c.TotalAbsent);
+                    var totalLate = Model.CourseStatistics.Sum(c => c.TotalLate);
+                    var totalExcused = Model.CourseStatistics.Sum(c => c.TotalExcused);
+                    var grandTotal = totalPresent + totalAbsent + totalLate + totalExcused;
+
+                    if (grandTotal > 0)
+                    {
+                        <div class="space-y-3">
+                            <!-- Present -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 bg-green-500 rounded"></div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Present</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">@totalPresent</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">(@((totalPresent * 100.0 / grandTotal).ToString("F1"))%)</span>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: @((totalPresent * 100.0 / grandTotal).ToString("F1"))%"></div>
+                            </div>
+
+                            <!-- Absent -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 bg-red-500 rounded"></div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Absent</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">@totalAbsent</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">(@((totalAbsent * 100.0 / grandTotal).ToString("F1"))%)</span>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: @((totalAbsent * 100.0 / grandTotal).ToString("F1"))%"></div>
+                            </div>
+
+                            <!-- Late -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 bg-yellow-500 rounded"></div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Late</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">@totalLate</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">(@((totalLate * 100.0 / grandTotal).ToString("F1"))%)</span>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: @((totalLate * 100.0 / grandTotal).ToString("F1"))%"></div>
+                            </div>
+
+                            @if (totalExcused > 0)
+                            {
+                                <!-- Excused -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 bg-blue-500 rounded"></div>
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Excused</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-bold text-gray-900 dark:text-white">@totalExcused</span>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">(@((totalExcused * 100.0 / grandTotal).ToString("F1"))%)</span>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: @((totalExcused * 100.0 / grandTotal).ToString("F1"))%"></div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-8">
+                            <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                            </svg>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">No attendance records found</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-8">
+                        <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                        </svg>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">No data available</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Course Statistics -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-4">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-3">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                Course-wise Statistics
+            </h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course</th>
+                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Section</th>
+                        <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Lectures</th>
+                        <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Students</th>
+                        <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Present</th>
+                        <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Absent</th>
+                        <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Late</th>
+                        <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Attendance %</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach (var course in Model.CourseStatistics)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            <td class="px-3 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                                @course.CourseName
+                            </td>
+                            <td class="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">
+                                @course.SectionName
+                                <span class="text-xs text-gray-500 dark:text-gray-400">(@course.BadgeName)</span>
+                            </td>
+                            <td class="px-3 py-3 text-center text-sm text-gray-700 dark:text-gray-300">
+                                <span class="font-semibold">@course.CompletedLectures</span> / @course.TotalLectures
+                            </td>
+                            <td class="px-3 py-3 text-center text-sm text-gray-700 dark:text-gray-300">
+                                <span class="font-semibold">@course.TotalStudents</span>
+                            </td>
+                            <td class="px-3 py-3 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    @course.TotalPresent
+                                </span>
+                            </td>
+                            <td class="px-3 py-3 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                    @course.TotalAbsent
+                                </span>
+                            </td>
+                            <td class="px-3 py-3 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                    @course.TotalLate
+                                </span>
+                            </td>
+                            <td class="px-3 py-3 text-center">
+                                @{
+                                    var percentage = course.AttendancePercentage;
+                                    var badgeClass = percentage >= 75 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" :
+                                                    percentage >= 50 ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" :
+                                                    "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+                                }
+                                <div class="flex flex-col items-center gap-1">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold @badgeClass">
+                                        @percentage.ToString("F1")%
+                                    </span>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                        <div class="h-1.5 rounded-full @(percentage >= 75 ? "bg-green-600" : percentage >= 50 ? "bg-yellow-500" : "bg-red-600")" style="width: @percentage%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- Section-wise Statistics -->
+@if (Model.SectionStatistics.Any())
+{
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-4">
+        <div class="bg-gradient-to-r from-purple-500 to-pink-600 p-3">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                Section-wise Overview
+            </h2>
+        </div>
+        <div class="p-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                @foreach (var stat in Model.SectionStatistics)
+                {
+                    var bgClass = stat.AverageAttendance >= 75 ? "from-green-500 to-emerald-600" :
+                                 stat.AverageAttendance >= 50 ? "from-yellow-500 to-orange-600" :
+                                 "from-red-500 to-pink-600";
+                    
+                    <div class="bg-gradient-to-br @bgClass rounded-lg shadow-md p-4 text-white">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="text-lg font-bold">@stat.SectionName</h3>
+                                <p class="text-xs opacity-90">@stat.BadgeName • Sem @stat.Semester</p>
+                            </div>
+                            <div class="bg-white bg-opacity-20 px-2 py-1 rounded text-xs font-bold">
+                                @stat.TotalCourses @(stat.TotalCourses == 1 ? "Course" : "Courses")
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="opacity-90">Lectures:</span>
+                                <span class="font-semibold">@stat.CompletedLectures / @stat.TotalLectures</span>
+                            </div>
+                            <div class="pt-2 border-t border-white border-opacity-30">
+                                <div class="flex justify-between items-center">
+                                    <span class="opacity-90">Avg. Attendance:</span>
+                                    <span class="text-2xl font-bold">@stat.AverageAttendance.ToString("F1")%</span>
+                                </div>
+                                <div class="mt-2 bg-white bg-opacity-20 rounded-full h-2">
+                                    <div class="bg-white rounded-full h-2 transition-all" style="width: @(stat.AverageAttendance)%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-6 rounded text-center">
+        <span class="text-6xl">📊</span>
+        <p class="text-gray-700 dark:text-gray-300 text-lg mt-4 font-semibold">No Data Available Yet</p>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Complete some lectures to see attendance reports and statistics</p>
+    </div>
+}
+
+@section Scripts {
+    <!-- No external chart libraries needed - using pure CSS/HTML -->
+}

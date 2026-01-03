@@ -1,0 +1,176 @@
+@page
+@model attendenceProject.Pages.Admin.Reports.StudentAttendanceModel
+@{
+    ViewData["Title"] = "Student Attendance Report";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">👨‍🎓 Student Attendance Report</h1>
+        <a asp-page="Index" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
+            ← Back to Reports
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">🔍 Filters</h2>
+        <form method="get">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                    <input type="date" asp-for="StartDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                    <input type="date" asp-for="EndDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Badge</label>
+                    <select asp-for="SelectedBadgeId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
+                        <option value="">All Badges</option>
+                        @foreach (var badge in Model.Badges)
+                        {
+                            <option value="@badge.Id">@badge.Name</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+                    <select asp-for="SelectedSectionId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" disabled="@(Model.SelectedBadgeId == null)">
+                        <option value="">All Sections</option>
+                        @foreach (var sec in Model.Sections)
+                        {
+                            <option value="@sec.Id">@sec.Name - @sec.Session</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Roll No</label>
+                    <input type="text" asp-for="SearchRollNo" placeholder="Search by Roll No" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+            <div class="flex space-x-2 mt-4">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md">
+                    🔎 Generate Report
+                </button>
+                <a asp-page="StudentAttendance" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md inline-block">
+                    Clear Filters
+                </a>
+            </div>
+        </form>
+    </div>
+
+    @if (Model.AttendanceData.Any())
+    {
+        <!-- Export Options -->
+        <div class="mb-4 flex justify-end space-x-2">
+            <a asp-page-handler="ExportCsv" 
+               asp-route-StartDate="@Model.StartDate" 
+               asp-route-EndDate="@Model.EndDate" 
+               asp-route-SelectedBadgeId="@Model.SelectedBadgeId" 
+               asp-route-SelectedSectionId="@Model.SelectedSectionId"
+               asp-route-SearchRollNo="@Model.SearchRollNo"
+               class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                📥 Export CSV
+            </a>
+            <button onclick="window.print()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg">
+                🖨️ Print Report
+            </button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <div class="text-2xl font-bold text-blue-900">@Model.AttendanceData.Count</div>
+                <div class="text-sm text-blue-700">Total Students</div>
+            </div>
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                <div class="text-2xl font-bold text-green-900">@Model.AttendanceData.Count(a => a.Status == "Good")</div>
+                <div class="text-sm text-green-700">Good (≥75%)</div>
+            </div>
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                <div class="text-2xl font-bold text-yellow-900">@Model.AttendanceData.Count(a => a.Status == "Warning")</div>
+                <div class="text-sm text-yellow-700">Warning (65-75%)</div>
+            </div>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                <div class="text-2xl font-bold text-red-900">@Model.AttendanceData.Count(a => a.Status == "Critical")</div>
+                <div class="text-sm text-red-700">Critical (&lt;65%)</div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Roll No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Section</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Badge</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Total</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Present</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Absent</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Leave</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Percentage</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach (var data in Model.AttendanceData)
+                        {
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">@data.RollNo</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">@data.StudentName</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">@data.Section</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">@data.Badge</td>
+                                <td class="px-6 py-4 text-sm text-center text-gray-900 font-semibold">@data.TotalLectures</td>
+                                <td class="px-6 py-4 text-sm text-center text-green-600 font-semibold">@data.PresentCount</td>
+                                <td class="px-6 py-4 text-sm text-center text-red-600 font-semibold">@data.AbsentCount</td>
+                                <td class="px-6 py-4 text-sm text-center text-blue-600 font-semibold">@data.LeaveCount</td>
+                                <td class="px-6 py-4 text-sm text-center">
+                                    <span class="text-lg font-bold @(data.Status == "Good" ? "text-green-600" : data.Status == "Warning" ? "text-yellow-600" : "text-red-600")">
+                                        @data.AttendancePercentage%
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-center">
+                                    @if (data.Status == "Good")
+                                    {
+                                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">✅ Good</span>
+                                    }
+                                    else if (data.Status == "Warning")
+                                    {
+                                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">⚠️ Warning</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">❌ Critical</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (Model.StartDate.HasValue && Model.EndDate.HasValue)
+    {
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <p class="text-yellow-700">ℹ️ No attendance data found for the selected filters.</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <style media="print">
+        @@page {
+            margin: 1cm;
+        }
+        .no-print {
+            display: none !important;
+        }
+    </style>
+}

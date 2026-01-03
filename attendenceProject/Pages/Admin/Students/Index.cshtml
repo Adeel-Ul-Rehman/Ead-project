@@ -1,0 +1,290 @@
+@page
+@model attendenceProject.Pages.Admin.Students.IndexModel
+@{
+    ViewData["Title"] = "Students Management";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<!-- Header -->
+<div class="mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-lg">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+                Students Management
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Manage students, enrollments, and bulk operations</p>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Messages -->
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="mb-6 bg-green-50 dark:bg-green-900 border-l-4 border-green-500 p-4 rounded-lg">
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-green-600 dark:text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-green-800 dark:text-green-200 font-medium">@Model.SuccessMessage</p>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="mb-6 bg-red-50 dark:bg-red-900 border-l-4 border-red-500 p-4 rounded-lg">
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-red-600 dark:text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-red-800 dark:text-red-200 font-medium">@Model.ErrorMessage</p>
+        </div>
+    </div>
+}
+
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-lg">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-blue-100 text-sm font-medium">Total Students</p>
+                <p class="text-3xl font-bold mt-2">@Model.TotalStudents</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-3">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white shadow-lg">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-green-100 text-sm font-medium">Active Students</p>
+                <p class="text-3xl font-bold mt-2">@Model.ActiveStudents</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-3">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white shadow-lg">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-purple-100 text-sm font-medium">Total Sections</p>
+                <p class="text-3xl font-bold mt-2">@Model.TotalSections</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-3">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg p-6 text-white shadow-lg">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-orange-100 text-sm font-medium">Total Programs</p>
+                <p class="text-3xl font-bold mt-2">@Model.TotalBadges</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-3">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex -mb-px">
+            <a href="?tab=all" class="@(Model.ActiveTab == "all" ? "border-blue-500 text-blue-600 dark:text-blue-400" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400") flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm transition duration-200 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                All Students
+            </a>
+            <a href="?tab=add" class="@(Model.ActiveTab == "add" ? "border-blue-500 text-blue-600 dark:text-blue-400" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400") flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm transition duration-200 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                </svg>
+                Add Student
+            </a>
+            <a href="?tab=import" class="@(Model.ActiveTab == "import" ? "border-blue-500 text-blue-600 dark:text-blue-400" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400") flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm transition duration-200 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Bulk Import
+            </a>
+        </nav>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="p-6">
+        @if (Model.ActiveTab == "all")
+        {
+            <partial name="_AllStudentsTab" model="Model" />
+        }
+        else if (Model.ActiveTab == "add")
+        {
+            <partial name="_AddStudentTab" model="Model" />
+        }
+        else if (Model.ActiveTab == "import")
+        {
+            <partial name="_ImportStudentsTab" model="Model" />
+        }
+    </div>
+</div>
+
+<!-- Delete Student Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="bg-red-100 dark:bg-red-900 rounded-full p-3">
+                    <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Confirm Deletion</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone</p>
+                </div>
+            </div>
+            
+            <p id="deleteMessage" class="text-gray-700 dark:text-gray-300 mb-6">
+                Are you sure you want to delete this student? All attendance records will be preserved but the student account will be removed.
+            </p>
+            
+            <div class="flex gap-3">
+                <button onclick="cancelDelete()" class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold py-3 px-4 rounded-lg transition duration-200">
+                    Cancel
+                </button>
+                <button onclick="confirmDelete()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-lg">
+                    Delete Student
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Enrollment Modal -->
+<div id="removeEnrollmentModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="bg-orange-100 dark:bg-orange-900 rounded-full p-3">
+                    <svg class="w-8 h-8 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Remove Enrollment</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Confirm removal</p>
+                </div>
+            </div>
+            
+            <p class="text-gray-700 dark:text-gray-300 mb-6">
+                Are you sure you want to remove this student from the section?
+            </p>
+            
+            <div class="flex gap-3">
+                <button onclick="cancelRemoveEnrollment()" class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold py-3 px-4 rounded-lg transition duration-200">
+                    Cancel
+                </button>
+                <button onclick="confirmRemoveEnrollment()" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-lg">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide success messages after 5 seconds
+        setTimeout(function() {
+            const successMsg = document.querySelector('.bg-green-50');
+            if (successMsg) {
+                successMsg.style.transition = 'opacity 0.5s';
+                successMsg.style.opacity = '0';
+                setTimeout(() => successMsg.remove(), 500);
+            }
+        }, 5000);
+
+        // Delete Student Modal
+        let deleteFormToSubmit = null;
+
+        function showDeleteModal(event, studentName) {
+            event.preventDefault();
+            deleteFormToSubmit = event.target.closest('form');
+            document.getElementById('deleteMessage').textContent = 
+                `Are you sure you want to delete ${studentName}? All attendance records will be preserved but the student account will be removed.`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function confirmDelete() {
+            if (deleteFormToSubmit) {
+                deleteFormToSubmit.submit();
+            }
+        }
+
+        function cancelDelete() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            deleteFormToSubmit = null;
+        }
+
+        // Remove Enrollment Modal
+        let removeEnrollmentFormToSubmit = null;
+
+        function showRemoveEnrollmentModal(event) {
+            event.preventDefault();
+            removeEnrollmentFormToSubmit = event.target.closest('form');
+            document.getElementById('removeEnrollmentModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function confirmRemoveEnrollment() {
+            if (removeEnrollmentFormToSubmit) {
+                removeEnrollmentFormToSubmit.submit();
+            }
+        }
+
+        function cancelRemoveEnrollment() {
+            document.getElementById('removeEnrollmentModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            removeEnrollmentFormToSubmit = null;
+        }
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cancelDelete();
+                cancelRemoveEnrollment();
+            }
+        });
+
+        // Close modals on background click
+        document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+            if (e.target === this) cancelDelete();
+        });
+
+        document.getElementById('removeEnrollmentModal')?.addEventListener('click', function(e) {
+            if (e.target === this) cancelRemoveEnrollment();
+        });
+    </script>
+}

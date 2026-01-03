@@ -1,0 +1,288 @@
+@model attendenceProject.Pages.Admin.Students.IndexModel
+
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Instructions Card -->
+    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 rounded-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-3">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+            </div>
+            Bulk Import Students
+        </h3>
+        <p class="text-gray-600 dark:text-gray-300">Upload a CSV or Excel file to import multiple students at once</p>
+    </div>
+
+    <!-- CSV Format Instructions -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+        <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            File Format Requirements
+        </h4>
+        
+        <div class="space-y-3 text-sm">
+            <p class="text-gray-600 dark:text-gray-400">Your CSV/Excel file should have the following columns in order:</p>
+            <div class="bg-gray-50 dark:bg-gray-900 rounded p-4 font-mono text-xs overflow-x-auto">
+                <div class="text-blue-600 dark:text-blue-400 font-semibold mb-2">Header Row (8 columns):</div>
+                <div>FullName, Email, RollNo, FatherName, BadgeName, Semester, Session, SectionName</div>
+                <div class="text-gray-500 dark:text-gray-400 mt-3 mb-2">Example:</div>
+                <div>John Doe, john@example.com, 2024-CS-001, Robert Doe, BSCS 23, 1, 2023, A</div>
+                <div>Jane Smith, jane@example.com, 2024-CS-002, Michael Smith, BSCS 23, 1, 2023, A</div>
+                <div>Ali Khan, ali@example.com, 2024-CS-003, Muhammad Khan, BSCS 23, 2, 2023, B</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-4">
+                <div class="bg-blue-50 dark:bg-blue-900 rounded p-3">
+                    <p class="font-semibold text-blue-800 dark:text-blue-200 mb-1">Required Fields:</p>
+                    <ul class="text-blue-700 dark:text-blue-300 space-y-1 text-xs">
+                        <li>• Full Name</li>
+                        <li>• Email (must be unique)</li>
+                        <li>• Roll Number (must be unique)</li>
+                        <li>• Badge Name (must exist)</li>
+                        <li>• Semester (1-8, must be integer)</li>
+                        <li>• Session (e.g., 2023, 2024)</li>
+                        <li>• Section Name (must exist)</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 dark:bg-green-900 rounded p-3">
+                    <p class="font-semibold text-green-800 dark:text-green-200 mb-1">Optional Fields:</p>
+                    <ul class="text-green-700 dark:text-green-300 space-y-1 text-xs">
+                        <li>• Father's Name</li>
+                    </ul>
+                    <p class="font-semibold text-green-800 dark:text-green-200 mb-1 mt-3">Important Notes:</p>
+                    <ul class="text-green-700 dark:text-green-300 space-y-1 text-xs">
+                        <li>• Section must match Badge + Semester + Session + Name</li>
+                        <li>• All 4 criteria must match exactly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Template -->
+        <div class="mt-4 flex gap-3">
+            <a href="/sample_students_new.csv" download class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Download CSV Template (8 Columns)
+            </a>
+        </div>
+    </div>
+
+    <!-- Upload Form -->
+    @if (Model.ValidationResult == null)
+    {
+        <!-- Step 1: Upload and Validate -->
+        <form method="post" asp-page-handler="ValidateImport" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+            @Html.AntiForgeryToken()
+
+            <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Step 1: Upload & Validate File
+            </h4>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Upload CSV or Excel File <span class="text-red-500">*</span>
+                </label>
+                
+                <!-- Selected File Display -->
+                <div id="selectedFileDisplay" class="hidden mb-4 bg-blue-50 dark:bg-blue-900 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-600 dark:bg-blue-700 rounded-full p-2">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-blue-900 dark:text-blue-200">Selected File:</p>
+                                <p id="selectedFileName" class="text-lg font-bold text-blue-700 dark:text-blue-300"></p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="clearFileSelection()" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900 rounded-full transition duration-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="uploadArea" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-500 transition duration-200">
+                    <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="flex text-sm text-gray-600">
+                            <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-600 rounded-md font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 focus-within:outline-none">
+                                <span>Upload a file</span>
+                                <input id="file-upload" name="ImportFile" type="file" accept=".csv,.xlsx" class="sr-only" required />
+                            </label>
+                            <p class="pl-1 dark:text-gray-400">or drag and drop</p>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">CSV or XLSX up to 10MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4">
+                <button type="submit" id="validateBtn" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Validate File</span>
+                </button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <!-- Step 2: Validation Results & Import -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg space-y-6">
+            <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Step 2: Validation Results
+            </h4>
+
+            <!-- Validation Summary -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-green-50 dark:bg-green-900 rounded-lg p-4 border-2 border-green-200 dark:border-green-700">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-green-600 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-green-700 dark:text-green-300 font-medium">Valid Records</p>
+                            <p class="text-3xl font-bold text-green-800 dark:text-green-200">@Model.ValidationResult.ValidCount</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-red-50 dark:bg-red-900 rounded-lg p-4 border-2 border-red-200 dark:border-red-700">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-red-600 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-red-700 dark:text-red-300 font-medium">Errors Found</p>
+                            <p class="text-3xl font-bold text-red-800 dark:text-red-200">@Model.ValidationResult.ErrorCount</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error List -->
+            @if (Model.ValidationResult.ErrorCount > 0)
+            {
+                <div class="bg-red-50 dark:bg-red-900 rounded-lg p-4 border-l-4 border-red-500">
+                    <h5 class="font-semibold text-red-800 dark:text-red-200 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        Validation Errors
+                    </h5>
+                    <div class="max-h-64 overflow-y-auto space-y-1">
+                        @foreach (var error in Model.ValidationResult.Errors.Take(20))
+                        {
+                            <p class="text-sm text-red-700 dark:text-red-300">• @error</p>
+                        }
+                        @if (Model.ValidationResult.Errors.Count > 20)
+                        {
+                            <p class="text-sm text-red-700 dark:text-red-300 font-semibold">... and @(Model.ValidationResult.Errors.Count - 20) more errors</p>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4">
+                @if (Model.ValidationResult.ValidCount > 0)
+                {
+                    <form method="post" asp-page-handler="ImportStudents" class="flex-1">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg>
+                            <span>Import @Model.ValidationResult.ValidCount Valid Records</span>
+                        </button>
+                    </form>
+                }
+                <form method="post" asp-page-handler="ClearValidation" class="flex-1">
+                    <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <span>Upload Different File</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <!-- Help Text -->
+    <div class="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-500 p-4 rounded">
+        <div class="flex items-start">
+            <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <div class="flex-1">
+                <p class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Important Notes</p>
+                <ul class="mt-2 text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
+                    <li>• Duplicate emails and roll numbers will be automatically skipped</li>
+                    <li>• Invalid data will be highlighted with line numbers</li>
+                    <li>• Passwords are auto-generated and sent via email</li>
+                    <li>• Students will be automatically enrolled in their sections</li>
+                    <li>• Section must match Badge + Semester + Session + Section Name (all 4 criteria)</li>
+                    <li>• Semester must be an integer (1-8)</li>
+                    <li>• Badge and Section names must exactly match existing records</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // File name display
+    const fileInput = document.getElementById('file-upload');
+    const selectedFileDisplay = document.getElementById('selectedFileDisplay');
+    const selectedFileName = document.getElementById('selectedFileName');
+    const uploadArea = document.getElementById('uploadArea');
+    const validateBtn = document.getElementById('validateBtn');
+
+    if (fileInput && validateBtn) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFileName.textContent = file.name;
+                selectedFileDisplay.classList.remove('hidden');
+                uploadArea.classList.add('hidden');
+                validateBtn.disabled = false;
+            }
+        });
+
+        // Initialize button state
+        validateBtn.disabled = !fileInput.files.length;
+    }
+
+    function clearFileSelection() {
+        if (fileInput) {
+            fileInput.value = '';
+            selectedFileDisplay.classList.add('hidden');
+            uploadArea.classList.remove('hidden');
+            if (validateBtn) validateBtn.disabled = true;
+        }
+    }
+</script>

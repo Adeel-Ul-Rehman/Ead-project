@@ -1,0 +1,32 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Remove focus rings globally */
+*, *:focus, *:active, *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Tailwind focus ring removal */
+input:focus, select:focus, textarea:focus, button:focus {
+  --tw-ring-shadow: none !important;
+  --tw-ring-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}

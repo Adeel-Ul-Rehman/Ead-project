@@ -1,0 +1,133 @@
+using attendence.Data.Data;
+using attendence.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+
+namespace attendenceProject.Pages.Admin.Lectures
+{
+    [Authorize(Roles = "Admin")]
+    public class IndexModel : PageModel
+    {
+        private readonly ApplicationDbContext _context;
+
+        public IndexModel(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public List<Lecture> Lectures { get; set; } = new();
+        public List<Course> AllCourses { get; set; } = new();
+        public List<Section> AllSections { get; set; } = new();
+        public List<Teacher> AllTeachers { get; set; } = new();
+
+        // Filter properties
+        public int? CourseFilter { get; set; }
+        public int? SectionFilter { get; set; }
+        public int? TeacherFilter { get; set; }
+        public string StatusFilter { get; set; } = "all";
+        public string DateRangeFilter { get; set; } = "all";
+        public string? SearchTerm { get; set; }
+
+        // Statistics properties
+        public int TotalLectures { get; set; }
+        public int TodayLectures { get; set; }
+        public int UpcomingLectures { get; set; }
+        public int CompletedLectures { get; set; }
+
+        // Calendar data properties
+        public List<CalendarWeekDay> CalendarWeekDays { get; set; } = new();
+        public DateTime CalendarStartDate { get; set; }
+        public DateTime CalendarEndDate { get; set; }
+
+        public async Task OnGetAsync(int? courseId, int? sectionId, int? teacherId, string? status, string? dateRange, string? searchTerm)
+        {
+            CourseFilter = courseId;
+            SectionFilter = sectionId;
+            DateRangeFilter = dateRange ?? "all";
+
+            // Get all courses and sections for filters
+            AllCourses = await _context.Courses.OrderBy(c => c.Code).ToListAsync();
+            AllSections = await _context.Sections
+                .Include(s => s.Badge)
+                .OrderBy(s => s.Badge.Name)
+                .ThenBy(s => s.Name)
+                .ToListAsync();
+
+            // Build query
+            var query = _context.Lectures
+                .Include(l => l.TimetableRule)
+                    .ThenInclude(tr => tr.TeacherCourse)
+                        .ThenInclude(tc => tc.Course)
+                .Include(l => l.TimetableRule)
+                    .ThenInclude(tr => tr.TeacherCourse)
+                        .ThenInclude(tc => tc.Section)
+                            .ThenInclude(s => s.Badge)
+                .Include(l => l.TimetableRule)
+                    .ThenInclude(tr => tr.TeacherCourse)
+                        .ThenInclude(tc => tc.Teacher)
+                            .ThenInclude(t => t.User)
+                .AsQueryable();
+
+            // Apply filters
+            if (courseId.HasValue)
+            {
+                query = query.Where(l => l.TimetableRule.TeacherCourse.CourseId == courseId.Value);
+            }
+
+            if (sectionId.HasValue)
+            {
+                query = query.Where(l => l.TimetableRule.TeacherCourse.SectionId == sectionId.Value);
+            }
+
+            // Date range filters
+            var today = DateTime.Today;
+            switch (dateRange?.ToLower())
+            {
+                case "today":
+                    query = query.Where(l => l.StartDateTime.Date == today);
+                    break;
+                case "week":
+                    var weekEnd = today.AddDays(7);
+                    query = query.Where(l => l.StartDateTime.Date >= today && l.StartDateTime.Date <= weekEnd);
+                    break;
+                case "month":
+                    var monthEnd = today.AddMonths(1);
+                    query = query.Where(l => l.StartDateTime.Date >= today && l.StartDateTime.Date <= monthEnd);
+                    break;
+                case "future":
+                    query = query.Where(l => l.StartDateTime >= DateTime.Now);
+                    break;
+            }
+
+            Lectures = await query.OrderBy(l => l.StartDateTime).ToListAsync();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var lecture = await _context.Lectures
+                .Include(l => l.AttendanceRecords)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (lecture == null)
+            {
+                TempData["Error"] = "Lecture not found.";
+                return RedirectToPage();
+            }
+
+            // Check if attendance has been marked
+            if (lecture.AttendanceRecords.Any())
+            {
+                TempData["Error"] = $"Cannot delete lecture - {lecture.AttendanceRecords.Count} attendance records exist.";
+                return RedirectToPage();
+            }
+
+            _context.Lectures.Remove(lecture);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Lecture deleted successfully.";
+            return RedirectToPage();
+        }
+    }
+}

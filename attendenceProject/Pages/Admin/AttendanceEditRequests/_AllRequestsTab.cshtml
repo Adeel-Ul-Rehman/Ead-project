@@ -1,0 +1,117 @@
+@model attendenceProject.Pages.Admin.AttendanceEditRequests.IndexModel
+
+<!-- Search and Filter -->
+<div class="mb-6">
+    <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <input type="hidden" name="tab" value="@Model.ActiveTab" />
+        <input type="hidden" name="requestType" value="@Model.RequestType" />
+
+        <div class="flex-1">
+            <input type="text" name="searchTerm" value="@Model.SearchTerm" placeholder="Search by teacher, course, or reason..."
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+        </div>
+
+        <select name="teacherId" class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
+            <option value="">All Teachers</option>
+            @foreach (var teacher in Model.Teachers)
+            {
+                <option value="@teacher.Id" selected="@(Model.SelectedTeacherId == teacher.Id)">@teacher.User.FullName</option>
+            }
+        </select>
+
+        <div>
+            <input type="date" name="startDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
+        </div>
+
+        <div>
+            <input type="date" name="endDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
+        </div>
+
+        <div class="flex gap-2">
+            <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Search
+            </button>
+
+            @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.SelectedTeacherId.HasValue || Model.StartDate.HasValue || Model.EndDate.HasValue)
+            {
+                <a href="?tab=@Model.ActiveTab&requestType=@Model.RequestType" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-4 py-3 rounded-lg transition duration-200">
+                    Clear
+                </a>
+            }
+        </div>
+    </form>
+</div>
+
+<!-- Requests List -->
+@{
+    // Apply tab filter
+    var filteredRequests = Model.ActiveTab switch
+    {
+        "pending" => Model.AllRequests.Where(r => r.Status == "Pending"),
+        "approved" => Model.AllRequests.Where(r => r.Status == "Approved"),
+        "rejected" => Model.AllRequests.Where(r => r.Status == "Rejected"),
+        _ => Model.AllRequests
+    };
+
+    // Apply request type filter
+    if (Model.RequestType == "extension")
+    {
+        filteredRequests = filteredRequests.Where(r => r.RequestType == "extension");
+    }
+    else if (Model.RequestType == "edit")
+    {
+        filteredRequests = filteredRequests.Where(r => r.RequestType == "edit");
+    }
+
+    var requestsList = filteredRequests.ToList();
+}
+
+@if (requestsList.Any())
+{
+    <div class="space-y-4">
+        @foreach (var request in requestsList)
+        {
+            <partial name="_RequestCard" model="request" />
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No requests found</h3>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            @if (Model.ActiveTab == "pending")
+            {
+                <text>No pending requests to review.</text>
+            }
+            else if (Model.ActiveTab == "approved")
+            {
+                <text>No approved requests found.</text>
+            }
+            else if (Model.ActiveTab == "rejected")
+            {
+                <text>No rejected requests found.</text>
+            }
+            else if (Model.RequestType == "extension")
+            {
+                <text>No extension requests found.</text>
+            }
+            else if (Model.RequestType == "edit")
+            {
+                <text>No edit requests found.</text>
+            }
+            else
+            {
+                <text>No attendance requests found.</text>
+            }
+        </p>
+    </div>
+}

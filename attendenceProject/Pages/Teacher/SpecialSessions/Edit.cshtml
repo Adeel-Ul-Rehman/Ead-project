@@ -1,0 +1,214 @@
+@page
+@model attendenceProject.Pages.Teacher.SpecialSessions.EditModel
+@{
+    ViewData["Title"] = "Edit Special Session";
+}
+
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Edit Special Session</h1>
+                <p class="mt-1 text-gray-600">Update session details before it starts</p>
+            </div>
+            <a asp-page="./Index" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <form method="post" class="p-6 space-y-6">
+            <input type="hidden" asp-for="Input.Id" />
+            <div asp-validation-summary="ModelOnly" class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800"></div>
+
+            <!-- Course Info (Read-only) -->
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Course & Section</label>
+                <p class="text-gray-900 font-medium">@Model.CourseInfo</p>
+                <p class="text-sm text-gray-500 mt-1">Course and section cannot be changed</p>
+            </div>
+
+            <!-- Session Type -->
+            <div>
+                <label asp-for="Input.LectureType" class="block text-sm font-medium text-gray-700 mb-2">
+                    Session Type <span class="text-red-500">*</span>
+                </label>
+                <div class="grid grid-cols-3 gap-3">
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="Quiz" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-yellow-600">
+                            <span class="text-2xl mb-1">🎯</span>
+                            <span class="font-medium">Quiz</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-yellow-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="Test" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-red-600">
+                            <span class="text-2xl mb-1">📝</span>
+                            <span class="font-medium">Test</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-red-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="Lab" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-purple-600">
+                            <span class="text-2xl mb-1">🔬</span>
+                            <span class="font-medium">Lab</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-purple-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="Practical" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-green-600">
+                            <span class="text-2xl mb-1">⚙️</span>
+                            <span class="font-medium">Practical</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-green-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="Workshop" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-orange-600">
+                            <span class="text-2xl mb-1">🛠️</span>
+                            <span class="font-medium">Workshop</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-orange-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="GuestLecture" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-indigo-600">
+                            <span class="text-2xl mb-1">🎤</span>
+                            <span class="font-medium text-sm">Guest Lecture</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-indigo-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="Review" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-blue-600">
+                            <span class="text-2xl mb-1">📚</span>
+                            <span class="font-medium">Review</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-blue-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="MakeUp" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-teal-600">
+                            <span class="text-2xl mb-1">🔄</span>
+                            <span class="font-medium">Make-Up</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-teal-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" asp-for="Input.LectureType" value="Extra" class="peer sr-only" />
+                        <div class="flex flex-col items-center w-full peer-checked:text-pink-600">
+                            <span class="text-2xl mb-1">➕</span>
+                            <span class="font-medium">Extra</span>
+                        </div>
+                        <div class="absolute inset-0 border-2 border-pink-500 rounded-lg opacity-0 peer-checked:opacity-100"></div>
+                    </label>
+                </div>
+                <span asp-validation-for="Input.LectureType" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Date and Time -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label asp-for="Input.SessionDate" class="block text-sm font-medium text-gray-700 mb-2">
+                        Date <span class="text-red-500">*</span>
+                    </label>
+                    <input asp-for="Input.SessionDate" type="date" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+                    <span asp-validation-for="Input.SessionDate" class="text-red-500 text-sm mt-1"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Input.StartTime" class="block text-sm font-medium text-gray-700 mb-2">
+                        Start Time <span class="text-red-500">*</span>
+                    </label>
+                    <input asp-for="Input.StartTime" type="time" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+                    <span asp-validation-for="Input.StartTime" class="text-red-500 text-sm mt-1"></span>
+                </div>
+            </div>
+
+            <!-- Duration -->
+            <div>
+                <label asp-for="Input.DurationMinutes" class="block text-sm font-medium text-gray-700 mb-2">
+                    Duration (minutes) <span class="text-red-500">*</span>
+                </label>
+                <div class="flex gap-2">
+                    <input asp-for="Input.DurationMinutes" type="number" min="15" max="300" step="5"
+                           class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+                    <div class="flex gap-2">
+                        <button type="button" onclick="document.querySelector('[name=\'Input.DurationMinutes\']').value=30" 
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">30m</button>
+                        <button type="button" onclick="document.querySelector('[name=\'Input.DurationMinutes\']').value=60" 
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">60m</button>
+                        <button type="button" onclick="document.querySelector('[name=\'Input.DurationMinutes\']').value=90" 
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">90m</button>
+                        <button type="button" onclick="document.querySelector('[name=\'Input.DurationMinutes\']').value=120" 
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">120m</button>
+                    </div>
+                </div>
+                <span asp-validation-for="Input.DurationMinutes" class="text-red-500 text-sm mt-1"></span>
+                <p class="mt-1 text-sm text-gray-500">Duration between 15 and 300 minutes</p>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label asp-for="Input.Description" class="block text-sm font-medium text-gray-700 mb-2">
+                    Description (Optional)
+                </label>
+                <textarea asp-for="Input.Description" rows="3" 
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                          placeholder="Add any additional details about this session..."></textarea>
+                <span asp-validation-for="Input.Description" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                <a asp-page="./Index" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition">
+                    Cancel
+                </a>
+                <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+        <div class="flex items-start">
+            <svg class="w-5 h-5 text-amber-500 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <div class="text-amber-800">
+                <p class="font-medium mb-1">Note:</p>
+                <ul class="text-sm space-y-1 list-disc list-inside">
+                    <li>Changes can only be made before the session starts</li>
+                    <li>If attendance has been marked, those records will be preserved</li>
+                    <li>System will check for schedule conflicts with the new time</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

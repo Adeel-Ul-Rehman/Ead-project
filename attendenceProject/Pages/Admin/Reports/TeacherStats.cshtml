@@ -1,0 +1,88 @@
+@page
+@model attendenceProject.Pages.Admin.Reports.TeacherStatsModel
+@{
+    ViewData["Title"] = "Teacher Marking Statistics";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">👨‍🏫 Teacher Marking Statistics</h1>
+        <a asp-page="Index" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
+            ← Back to Reports
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="text-sm font-semibold opacity-80 mb-2">Total Teachers</div>
+            <div class="text-3xl font-bold">@Model.TotalTeachers</div>
+        </div>
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="text-sm font-semibold opacity-80 mb-2">Avg Marking Rate</div>
+            <div class="text-3xl font-bold">@Model.OverallMarkingRate%</div>
+        </div>
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="text-sm font-semibold opacity-80 mb-2">Fully Compliant (95%+)</div>
+            <div class="text-3xl font-bold">@Model.FullyCompliantTeachers</div>
+        </div>
+        <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="text-sm font-semibold opacity-80 mb-2">Total Lectures</div>
+            <div class="text-3xl font-bold">@Model.TeacherStats.Sum(t => t.TotalLectures)</div>
+        </div>
+    </div>
+
+    <!-- Teacher Statistics Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">📊 Teacher Marking Performance</h2>
+        </div>
+
+        @if (Model.TeacherStats.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Badge</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Teacher Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Designation</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Lectures</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Marked</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Late Marked</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Marking Rate</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Extension Requests</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach (var teacher in Model.TeacherStats)
+                        {
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">@teacher.BadgeNumber</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">@teacher.Name</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">@teacher.Designation</td>
+                                <td class="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white">@teacher.TotalLectures</td>
+                                <td class="px-6 py-4 text-center text-sm font-semibold text-green-600">@teacher.MarkedLectures</td>
+                                <td class="px-6 py-4 text-center text-sm font-semibold text-orange-600">@teacher.LateMarked</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full @(teacher.MarkingRate >= 95 ? "bg-green-100 text-green-800" : teacher.MarkingRate >= 85 ? "bg-blue-100 text-blue-800" : teacher.MarkingRate >= 75 ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800")">
+                                        @teacher.MarkingRate%
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center text-sm text-purple-600">@teacher.ExtensionRequests</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-12 text-center">
+                <div class="text-6xl mb-4">📊</div>
+                <p class="text-gray-600 dark:text-gray-400 text-lg">No teacher data available</p>
+            </div>
+        }
+    </div>
+</div>

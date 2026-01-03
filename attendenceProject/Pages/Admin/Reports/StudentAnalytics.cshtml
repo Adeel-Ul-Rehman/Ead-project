@@ -1,0 +1,161 @@
+@page
+@model attendenceProject.Pages.Admin.Reports.StudentAnalyticsModel
+@{
+    ViewData["Title"] = "Student Analytics Report";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-2xl p-8 mb-8 text-white">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">📈 Student Analytics Report</h1>
+                <p class="text-lg opacity-90">Top performers, defaulters, improvement/decline trends</p>
+            </div>
+            <a href="/Admin/Reports" class="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition duration-200 font-semibold">
+                ← Back to Reports
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="text-sm opacity-90 mb-1">Top Performers</div>
+            <div class="text-4xl font-bold">@Model.TopPerformersCount</div>
+            <div class="text-xs opacity-75 mt-2">≥ 90% attendance</div>
+        </div>
+        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="text-sm opacity-90 mb-1">Average Students</div>
+            <div class="text-4xl font-bold">@Model.AverageStudentsCount</div>
+            <div class="text-xs opacity-75 mt-2">75-89% attendance</div>
+        </div>
+        <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="text-sm opacity-90 mb-1">At Risk</div>
+            <div class="text-4xl font-bold">@Model.AtRiskCount</div>
+            <div class="text-xs opacity-75 mt-2">60-74% attendance</div>
+        </div>
+        <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="text-sm opacity-90 mb-1">Critical</div>
+            <div class="text-4xl font-bold">@Model.CriticalCount</div>
+            <div class="text-xs opacity-75 mt-2">< 60% attendance</div>
+        </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span class="text-green-600">🏆</span> Top 10 Performers
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-green-50 to-emerald-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Rank</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Roll No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Student Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Section</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Attendance %</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Total Lectures</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach (var (student, index) in Model.TopPerformers.Select((s, i) => (s, i)))
+                    {
+                        <tr class="hover:bg-green-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="text-2xl">
+                                    @if (index == 0) { <text>🥇</text> }
+                                    else if (index == 1) { <text>🥈</text> }
+                                    else if (index == 2) { <text>🥉</text> }
+                                    else { <span class="text-gray-600 font-semibold">@(index + 1)</span> }
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">@student.RollNo</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">@student.Name</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">@student.Section</td>
+                            <td class="px-6 py-4">
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+                                    @student.AttendancePercentage%
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">@student.TotalLectures</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Defaulters -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span class="text-red-600">⚠️</span> Critical Attendance Students (Below 60%)
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-red-50 to-pink-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Roll No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Student Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Section</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Attendance %</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Present/Total</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach (var student in Model.Defaulters)
+                    {
+                        <tr class="hover:bg-red-50 transition-colors">
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">@student.RollNo</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">@student.Name</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">@student.Section</td>
+                            <td class="px-6 py-4">
+                                <span class="@(student.AttendancePercentage < 50 ? "bg-red-500" : "bg-orange-500") text-white px-3 py-1 rounded-full text-sm font-bold">
+                                    @student.AttendancePercentage%
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">@student.Present / @student.TotalLectures</td>
+                            <td class="px-6 py-4">
+                                <span class="@(student.AttendancePercentage < 50 ? "bg-red-100 text-red-800" : "bg-orange-100 text-orange-800") px-2 py-1 rounded text-xs font-semibold">
+                                    @(student.AttendancePercentage < 50 ? "CRITICAL" : "WARNING")
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Improvement Trends -->
+    <div class="bg-white rounded-2xl shadow-xl p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span class="text-blue-600">📊</span> Attendance Distribution
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+                <div class="text-green-700 font-semibold mb-1">Excellent (≥90%)</div>
+                <div class="text-3xl font-bold text-green-600">@Model.TopPerformersCount</div>
+                <div class="text-sm text-gray-600 mt-1">@(Model.TotalStudents > 0 ? Math.Round((double)Model.TopPerformersCount / Model.TotalStudents * 100, 1) : 0)% of total</div>
+            </div>
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
+                <div class="text-yellow-700 font-semibold mb-1">Good (75-89%)</div>
+                <div class="text-3xl font-bold text-yellow-600">@Model.AverageStudentsCount</div>
+                <div class="text-sm text-gray-600 mt-1">@(Model.TotalStudents > 0 ? Math.Round((double)Model.AverageStudentsCount / Model.TotalStudents * 100, 1) : 0)% of total</div>
+            </div>
+            <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-lg">
+                <div class="text-orange-700 font-semibold mb-1">At Risk (60-74%)</div>
+                <div class="text-3xl font-bold text-orange-600">@Model.AtRiskCount</div>
+                <div class="text-sm text-gray-600 mt-1">@(Model.TotalStudents > 0 ? Math.Round((double)Model.AtRiskCount / Model.TotalStudents * 100, 1) : 0)% of total</div>
+            </div>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div class="text-red-700 font-semibold mb-1">Critical (<60%)</div>
+                <div class="text-3xl font-bold text-red-600">@Model.CriticalCount</div>
+                <div class="text-sm text-gray-600 mt-1">@(Model.TotalStudents > 0 ? Math.Round((double)Model.CriticalCount / Model.TotalStudents * 100, 1) : 0)% of total</div>
+            </div>
+        </div>
+    </div>
+</div>

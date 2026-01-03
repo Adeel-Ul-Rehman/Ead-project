@@ -1,0 +1,348 @@
+﻿@page
+@model attendenceProject.Pages.Teacher.DashboardModel
+@{
+    ViewData["Title"] = "Teacher Dashboard";
+}
+
+<!-- Header Section -->
+<div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2 sm:gap-3">
+        <span class="text-3xl sm:text-4xl md:text-5xl">👩‍🏫</span>
+        <span>Teacher Dashboard</span>
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2 text-sm sm:text-base md:text-lg">Welcome back, @User.Identity?.Name!</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+    <!-- Weekly Classes -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
+        <div class="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-lg p-2.5">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-white text-opacity-95 text-xs font-semibold uppercase tracking-wide">Weekly Classes</p>
+            <p class="text-white text-3xl font-extrabold mt-1.5">@Model.TotalScheduledClasses</p>
+        </div>
+    </div>
+
+    <!-- Marked Attendance -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
+        <div class="bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-lg p-2.5">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-white text-opacity-95 text-xs font-semibold uppercase tracking-wide">Marked</p>
+            <p class="text-white text-3xl font-extrabold mt-1.5">@Model.MarkedAttendance</p>
+        </div>
+    </div>
+
+    <!-- Pending Attendance -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
+        <div class="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-lg p-2.5">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-white text-opacity-95 text-xs font-semibold uppercase tracking-wide">Pending</p>
+            <p class="text-white text-3xl font-extrabold mt-1.5">@Model.PendingAttendance</p>
+        </div>
+    </div>
+
+    <!-- My Courses -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
+        <div class="bg-gradient-to-br from-purple-500 via-purple-600 to-pink-600 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-lg p-2.5">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-white text-opacity-95 text-xs font-semibold uppercase tracking-wide">My Courses</p>
+            <p class="text-white text-3xl font-extrabold mt-1.5">@Model.TotalCourses</p>
+        </div>
+    </div>
+
+    <!-- My Sections -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
+        <div class="bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-lg p-2.5">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-white text-opacity-95 text-xs font-semibold uppercase tracking-wide">My Sections</p>
+            <p class="text-white text-3xl font-extrabold mt-1.5">@Model.TotalSections</p>
+        </div>
+    </div>
+
+    <!-- Pending Requests -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
+        <div class="bg-gradient-to-br from-red-500 via-red-600 to-rose-600 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-lg p-2.5">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-white text-opacity-95 text-xs font-semibold uppercase tracking-wide">Requests</p>
+            <p class="text-white text-3xl font-extrabold mt-1.5">@Model.PendingRequests</p>
+        </div>
+    </div>
+</div>
+
+<!-- Current/Next Lecture Alert -->
+@if (Model.CurrentOrNextLecture != null)
+{
+    var isOngoing = Model.IsCurrentLectureOngoing;
+    var bgColor = isOngoing ? "from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900" : "from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900";
+    var borderColor = isOngoing ? "border-green-500" : "border-blue-500";
+    <div class="mb-8 bg-gradient-to-r @bgColor border-l-4 @borderColor rounded-lg shadow-lg p-6">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-start gap-4 flex-1">
+                @if (isOngoing)
+                {
+                    <div class="bg-green-500 rounded-full p-3 animate-pulse flex-shrink-0">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                }
+                else
+                {
+                    <div class="bg-blue-500 rounded-full p-3 flex-shrink-0">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                }
+                <div class="flex-1">
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        @if (isOngoing)
+                        {
+                            <span>🔴 Ongoing Lecture</span>
+                        }
+                        else
+                        {
+                            <span>📅 Next Lecture</span>
+                        }
+                    </h3>
+                    @if (!string.IsNullOrEmpty(Model.LectureMessage))
+                    {
+                        <p class="text-sm font-semibold @(isOngoing ? "text-green-600 dark:text-green-300" : "text-blue-600 dark:text-blue-300") mt-1">@Model.LectureMessage</p>
+                    }
+                    <div class="mt-3 space-y-2">
+                        <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">@Model.CurrentOrNextLecture.CourseTitle (@Model.CurrentOrNextLecture.CourseCode)</p>
+                        <div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300">
+                            <span><strong>Section:</strong> @Model.CurrentOrNextLecture.SectionName</span>
+                            @if (!string.IsNullOrEmpty(Model.CurrentOrNextLecture.Room))
+                            {
+                                <span><strong>Room:</strong> @Model.CurrentOrNextLecture.Room</span>
+                            }
+                            <span><strong>Time:</strong> @Model.CurrentOrNextLecture.StartDateTime.ToString("hh:mm tt") - @Model.CurrentOrNextLecture.EndDateTime.ToString("hh:mm tt")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (isOngoing)
+            {
+                @if (Model.CurrentOrNextLecture.CanMarkAttendance)
+                {
+                    @if (Model.CurrentOrNextLecture.LectureId.HasValue)
+                    {
+                        <!-- Edit Attendance Button -->
+                        <a href="/Teacher/Attendance/Edit?lectureId=@Model.CurrentOrNextLecture.LectureId" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 md:px-8 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center gap-2 whitespace-nowrap">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            @Model.CurrentOrNextLecture.StatusMessage
+                        </a>
+                    }
+                    else
+                    {
+                        <!-- First time marking -->
+                        <a href="/Teacher/Attendance/Mark?timetableRuleId=@Model.CurrentOrNextLecture.TimetableRuleId&date=@Model.CurrentOrNextLecture.StartDateTime.ToString("yyyy-MM-dd")" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 md:px-8 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center gap-2 whitespace-nowrap">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            @Model.CurrentOrNextLecture.StatusMessage
+                        </a>
+                    }
+                }
+                else
+                {
+                    <!-- Locked - Request Button -->
+                    <div class="flex flex-col gap-2">
+                        <span class="bg-red-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                            @Model.CurrentOrNextLecture.StatusMessage
+                        </span>
+                        @if (Model.CurrentOrNextLecture.LectureId.HasValue)
+                        {
+                            <a href="/Teacher/Requests/Extension?lectureId=@Model.CurrentOrNextLecture.LectureId" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center gap-2 whitespace-nowrap">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                </svg>
+                                Request Extension
+                            </a>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
+
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Upcoming Lectures -->
+    <div class="lg:col-span-2">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-t-lg">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <h2 class="text-xl font-bold">Upcoming Lectures</h2>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="/Teacher/Dashboard?filter=today" class="px-4 py-2 rounded-lg text-sm font-semibold transition @(Model.SelectedFilter == "today" ? "bg-white text-blue-600" : "bg-blue-500 hover:bg-blue-400 text-white")">
+                            Today
+                        </a>
+                        <a href="/Teacher/Dashboard?filter=week" class="px-4 py-2 rounded-lg text-sm font-semibold transition @(Model.SelectedFilter == "week" ? "bg-white text-blue-600" : "bg-blue-500 hover:bg-blue-400 text-white")">
+                            Week
+                        </a>
+                        <a href="/Teacher/Dashboard?filter=all" class="px-4 py-2 rounded-lg text-sm font-semibold transition @(Model.SelectedFilter == "all" ? "bg-white text-blue-600" : "bg-blue-500 hover:bg-blue-400 text-white")">
+                            All
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                @if (Model.UpcomingLectures.Any())
+                {
+                    <div class="space-y-3">
+                        @foreach (var lecture in Model.UpcomingLectures)
+                        {
+                            <div class="border-l-4 border-blue-500 bg-gray-50 dark:bg-gray-700 rounded-r-lg p-4 hover:shadow-md transition duration-300">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <h3 class="font-bold text-gray-800 dark:text-white text-lg">@lecture.CourseTitle (@lecture.CourseCode)</h3>
+                                        <div class="flex gap-4 mt-2 text-sm text-gray-600 dark:text-gray-300">
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                </svg>
+                                                @lecture.SectionName
+                                            </span>
+                                            @if (!string.IsNullOrEmpty(lecture.Room))
+                                            {
+                                                <span class="flex items-center gap-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                                    </svg>
+                                                    Room @lecture.Room
+                                                </span>
+                                            }
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                @lecture.StartDateTime.ToString("MMM dd, hh:mm tt")
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-xs font-semibold px-3 py-1 rounded-full">@lecture.Status</span>
+                                        @if (!string.IsNullOrEmpty(lecture.StatusMessage))
+                                        {
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">@lecture.StatusMessage</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-gray-500 dark:text-gray-400 text-lg">
+                            @if (Model.SelectedFilter == "today")
+                            {
+                                <text>No more lectures scheduled for today</text>
+                            }
+                            else if (Model.SelectedFilter == "week")
+                            {
+                                <text>No lectures scheduled for this week</text>
+                            }
+                            else
+                            {
+                                <text>No upcoming lectures scheduled</text>
+                            }
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Sidebar -->
+    <div class="lg:col-span-1">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-t-lg flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <h2 class="text-xl font-bold">Quick Actions</h2>
+            </div>
+            <div class="p-6 space-y-3">
+                <a href="/Teacher/Attendance" class="block w-full bg-green-50 dark:bg-green-900 hover:bg-green-100 dark:hover:bg-green-800 text-green-700 dark:text-green-200 font-semibold py-3 px-4 rounded-lg transition duration-300 flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    View Attendance
+                </a>
+                <a href="/Teacher/Timetable" class="block w-full bg-blue-50 dark:bg-blue-900 hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-200 font-semibold py-3 px-4 rounded-lg transition duration-300 flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    My Timetable
+                </a>
+                <a href="/Teacher/Reports" class="block w-full bg-purple-50 dark:bg-purple-900 hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-700 dark:text-purple-200 font-semibold py-3 px-4 rounded-lg transition duration-300 flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Reports
+                </a>
+                <a href="/Teacher/Students" class="block w-full bg-indigo-50 dark:bg-indigo-900 hover:bg-indigo-100 dark:hover:bg-indigo-800 text-indigo-700 dark:text-indigo-200 font-semibold py-3 px-4 rounded-lg transition duration-300 flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Students
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

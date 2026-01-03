@@ -1,0 +1,146 @@
+@page
+@model attendenceProject.Pages.Admin.Reports.SectionComparisonModel
+@{
+    ViewData["Title"] = "Section Comparison Report";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">🔄 Section Comparison Report</h1>
+        <a asp-page="Index" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
+            ← Back to Reports
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">🔍 Filters</h2>
+        <form method="get">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
+                    <input type="date" asp-for="StartDate" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label>
+                    <input type="date" asp-for="EndDate" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Badge</label>
+                    <select asp-for="SelectedBadgeId" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
+                        <option value="">All Badges</option>
+                        @foreach (var badge in Model.Badges)
+                        {
+                            <option value="@badge.Id">@badge.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                        Apply
+                    </button>
+                    <a asp-page="SectionComparison" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
+                        Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Export Button -->
+    <div class="mb-6">
+        <a asp-page-handler="ExportCsv" asp-all-route-data="@(new Dictionary<string, string> { 
+            ["StartDate"] = Model.StartDate?.ToString("yyyy-MM-dd") ?? "", 
+            ["EndDate"] = Model.EndDate?.ToString("yyyy-MM-dd") ?? "",
+            ["SelectedBadgeId"] = Model.SelectedBadgeId?.ToString() ?? ""
+        })" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition">
+            📥 Export CSV
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    @if (Model.SectionData.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                <p class="text-sm opacity-90 mb-1">Total Sections</p>
+                <p class="text-4xl font-bold">@Model.SectionData.Count</p>
+            </div>
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+                <p class="text-sm opacity-90 mb-1">Best Section</p>
+                <p class="text-2xl font-bold">@Model.SectionData.First().SectionName</p>
+                <p class="text-sm opacity-90">@Math.Round(Model.SectionData.First().AverageAttendance, 1)%</p>
+            </div>
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                <p class="text-sm opacity-90 mb-1">Total Students</p>
+                <p class="text-4xl font-bold">@Model.SectionData.Sum(s => s.TotalStudents)</p>
+            </div>
+            <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white">
+                <p class="text-sm opacity-90 mb-1">Total Defaulters</p>
+                <p class="text-4xl font-bold">@Model.SectionData.Sum(s => s.DefaulterStudents)</p>
+            </div>
+        </div>
+    }
+
+    <!-- Section Comparison Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Rank</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Section</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Badge</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Students</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Lectures</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Avg Attendance</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Excellent</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Defaulters</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Performance</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    @if (Model.SectionData.Any())
+                    {
+                        @for (int i = 0; i < Model.SectionData.Count; i++)
+                        {
+                            var section = Model.SectionData[i];
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-3 py-1 text-sm font-bold rounded-full @(i == 0 ? "bg-yellow-100 text-yellow-800" : i == 1 ? "bg-gray-100 text-gray-800" : i == 2 ? "bg-orange-100 text-orange-800" : "bg-gray-50 text-gray-600")">
+                                        @(i == 0 ? "🥇" : i == 1 ? "🥈" : i == 2 ? "🥉" : $"#{i + 1}")
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">@(section.SectionName)</td>
+                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">@(section.BadgeName)</td>
+                                <td class="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white">@(section.TotalStudents)</td>
+                                <td class="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white">@(section.TotalLectures)</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full @(section.AverageAttendance >= 80 ? "bg-green-100 text-green-800" : section.AverageAttendance >= 70 ? "bg-blue-100 text-blue-800" : section.AverageAttendance >= 60 ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800")">
+                                        @(section.AverageAttendance)%
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center text-sm text-green-600 font-semibold">@(section.ExcellentStudents)</td>
+                                <td class="px-6 py-4 text-center text-sm text-red-600 font-semibold">@(section.DefaulterStudents)</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full @(section.OverallPerformance == "Excellent" ? "bg-green-100 text-green-800" : section.OverallPerformance == "Good" ? "bg-blue-100 text-blue-800" : section.OverallPerformance == "Average" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800")">
+                                        @(section.OverallPerformance)
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                No section data found for the selected filters.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

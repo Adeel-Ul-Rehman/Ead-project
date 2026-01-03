@@ -1,0 +1,376 @@
+@page
+@model attendenceProject.Pages.Teacher.Attendance.MarkModel
+@{
+    ViewData["Title"] = "Mark Attendance";
+}
+
+<div class="mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+                <span class="text-4xl">✅</span>
+                <span>@(Model.CanEdit ? "Edit" : "Mark") Attendance</span>
+            </h1>
+            @if (Model.Lecture != null)
+            {
+                <p class="text-gray-600 dark:text-gray-400 mt-2">
+                    @Model.SectionName 
+                    (@Model.Lecture.TimetableRule.TeacherCourse.Section.Badge.Name - Semester @Model.Lecture.TimetableRule.TeacherCourse.Section.Semester)
+                </p>
+            }
+        </div>
+        <a href="/Teacher/Dashboard" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(TempData["Success"] as string))
+{
+    <div class="mb-6 bg-green-50 dark:bg-green-900 border-l-4 border-green-500 p-4 rounded">
+        <p class="text-green-700 dark:text-green-200">@TempData["Success"]</p>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(TempData["Error"] as string))
+{
+    <div class="mb-6 bg-red-50 dark:bg-red-900 border-l-4 border-red-500 p-4 rounded">
+        <p class="text-red-700 dark:text-red-200">@TempData["Error"]</p>
+    </div>
+}
+
+@if (Model.Lecture != null)
+{
+    <!-- Lecture Info Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Course</p>
+                <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.CourseTitle</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">@Model.CourseCode</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Room</p>
+                <p class="text-lg font-semibold text-gray-800 dark:text-white">@(Model.Room ?? "N/A")</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Date & Time</p>
+                <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.LectureDateTime</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Total Students</p>
+                <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.Students.Count</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        var alertClass = Model.MessageType switch
+        {
+            "success" => "bg-green-50 dark:bg-green-900 border-green-500 text-green-700 dark:text-green-200",
+            "warning" => "bg-yellow-50 dark:bg-yellow-900 border-yellow-500 text-yellow-700 dark:text-yellow-200",
+            "error" => "bg-red-50 dark:bg-red-900 border-red-500 text-red-700 dark:text-red-200",
+            _ => "bg-blue-50 dark:bg-blue-900 border-blue-500 text-blue-700 dark:text-blue-200"
+        };
+        
+        <div class="mb-6 @alertClass border-l-4 p-4 rounded-lg">
+            <div class="flex items-center gap-3">
+                @if (Model.MessageType == "success")
+                {
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                }
+                else if (Model.MessageType == "error")
+                {
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                    </svg>
+                }
+                else if (Model.MessageType == "warning")
+                {
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                }
+                else
+                {
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                }
+                <p class="font-semibold">@Model.Message</p>
+            </div>
+            @if (Model.HasApprovedExtension && Model.ExtensionDeadline.HasValue)
+            {
+                <p class="mt-2 text-sm">Extension Deadline: @Model.ExtensionDeadline.Value.ToString("MMM dd, yyyy hh:mm tt")</p>
+            }
+        </div>
+    }
+
+    @if (!Model.ViewOnly && (Model.CanMarkAttendance || Model.CanEdit) && !Model.IsLocked)
+    {
+        <!-- Attendance Form -->
+        <form method="post">
+            <input type="hidden" name="lectureId" value="@Model.Lecture.Id" />
+            <input type="hidden" name="isEdit" value="@Model.CanEdit" />
+            
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold">@(Model.CanEdit ? "Edit Attendance" : "Attendance Sheet")</h2>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="markAll('Present')" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded text-sm font-semibold transition">
+                                ✓ All Present
+                            </button>
+                            <button type="button" onclick="markAll('Absent')" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm font-semibold transition">
+                                ✗ All Absent
+                            </button>
+                            <button type="button" onclick="markAll('Excused')" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-sm font-semibold transition">
+                                ⓘ All Excused
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Roll No</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student Name</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">✓ Present</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">✗ Absent</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ⓘ Excused</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            @for (int i = 0; i < Model.Students.Count; i++)
+                            {
+                                var student = Model.Students[i];
+                                var isPresent = student.Status == "Present";
+                                var isAbsent = student.Status == "Absent";
+                                var isExcused = student.Status == "Excused";
+                                
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                        @student.RollNo
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                        @student.FullName
+                                    </td>
+                                    <input type="hidden" name="AttendanceRecords[@i].StudentId" value="@student.StudentId" />
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="radio" name="AttendanceRecords[@i].Status" value="Present" 
+                                               @(isPresent || (!isAbsent && !isExcused) ? "checked" : "")
+                                               class="w-5 h-5 text-green-600 focus:ring-green-500 cursor-pointer" />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="radio" name="AttendanceRecords[@i].Status" value="Absent" 
+                                               @(isAbsent ? "checked" : "")
+                                               class="w-5 h-5 text-red-600 focus:ring-red-500 cursor-pointer" />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="radio" name="AttendanceRecords[@i].Status" value="Excused" 
+                                               @(isExcused ? "checked" : "")
+                                               class="w-5 h-5 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-end gap-3">
+                    <a href="/Teacher/Dashboard" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                        Cancel
+                    </a>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300 flex items-center gap-2">
+                        @if (Model.CanEdit)
+                        {
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            <span>Update Attendance</span>
+                        }
+                        else
+                        {
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>Submit Attendance</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </form>
+    }
+    else if (Model.IsLocked && Model.Students.Any())
+    {
+        <!-- View Only Mode -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-gray-600 to-gray-700 text-white px-6 py-4">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Attendance Record (Locked)
+                </h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Roll No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student Name</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach (var student in Model.Students)
+                        {
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                    @student.RollNo
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                    @student.FullName
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @{
+                                        var statusClass = student.Status switch
+                                        {
+                                            "Present" => "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+                                            "Absent" => "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+                                            "Excused" => "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+                                            _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                                        };
+                                    }
+                                    <span class="@statusClass px-3 py-1 rounded-full text-xs font-semibold">@student.Status</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Request Extension Button -->
+        @if (!Model.HasApprovedExtension)
+        {
+            <div class="mt-6 flex justify-center">
+                <a href="/Teacher/Requests/Extension?lectureId=@Model.Lecture.Id" 
+                   class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Request Extension from Admin
+                </a>
+            </div>
+        }
+    }
+    else if (Model.IsLocked && !Model.Students.Any())
+    {
+        <!-- No Data Message with Extension Request -->
+        <div class="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-500 p-6 rounded-lg">
+            <div class="flex items-start gap-3">
+                <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <p class="font-semibold text-yellow-800 dark:text-yellow-200">Attendance window has closed</p>
+                    <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                        The marking window (10 minutes after lecture start) has ended and the lecture has finished.
+                        You can request an extension from the admin to mark attendance for this lecture.
+                    </p>
+                    <div class="mt-4">
+                        <a href="/Teacher/Requests/Extension?lectureId=@Model.Lecture.Id" 
+                           class="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Request Extension
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    
+    @* View-only mode message *@
+    @if (Model.ViewOnly)
+    {
+        <div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-6 rounded-lg">
+            <div class="flex items-center gap-3">
+                <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <p class="text-lg font-semibold text-blue-800 dark:text-blue-200">
+                        @{
+                            var now = DateTime.Now;
+                            var minutesFromStart = (now - Model.Lecture.StartDateTime).TotalMinutes;
+                            
+                            if (minutesFromStart < 0)
+                            {
+                                var minutesUntilStart = Math.Abs(minutesFromStart);
+                            }
+                            else if (minutesFromStart <= 10)
+                            {
+                                var minutesLeft = 10 - minutesFromStart;
+                                <text>Lecture is ongoing! You have @((int)minutesLeft) minutes left to mark attendance.</text>
+                            }
+                            else if (minutesFromStart <= 20)
+                            {
+                                if (Model.Lecture.AttendanceRecords.Any())
+                                {
+                                    var minutesLeft = 20 - minutesFromStart;
+                                    <text>You have @((int)minutesLeft) minutes left to edit attendance.</text>
+                                }
+                                else
+                                {
+                                    <text>Attendance marking window has closed. Please request admin approval to mark attendance.</text>
+                                }
+                            }
+                            else
+                            {
+                                if (Model.Lecture.AttendanceRecords.Any())
+                                {
+                                    <text>Attendance has been recorded for this lecture.</text>
+                                }
+                                else
+                                {
+                                    <text>Attendance window has closed. Please contact admin to mark attendance.</text>
+                                }
+                            }
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="bg-red-50 dark:bg-red-900 border-l-4 border-red-500 p-6 rounded-lg">
+        <p class="text-red-700 dark:text-red-200 font-semibold">Lecture not found</p>
+        <p class="text-red-600 dark:text-red-300 mt-2">The requested lecture could not be found. Please return to the dashboard.</p>
+        <div class="mt-4">
+            <a href="/Teacher/Dashboard" class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition">
+                Go to Dashboard
+            </a>
+        </div>
+    </div>
+}
+
+<script>
+    function markAll(status) {
+        const radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
+        radios.forEach(radio => {
+            radio.checked = true;
+        });
+    }
+</script>

@@ -1,0 +1,306 @@
+@page
+@model attendenceProject.Pages.Admin.TeacherDataExportModel
+@{
+    ViewData["Title"] = "Teacher Data Export";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    .stat-card {
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .export-btn {
+        transition: all 0.3s ease;
+    }
+
+    .export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Modern Gradient Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-2xl p-8 mb-8 text-white animate-fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center mb-2">
+                        <span class="text-5xl mr-4">📊</span>
+                        <h1 class="text-4xl font-bold">Teacher Data Export</h1>
+                    </div>
+                    <p class="text-indigo-100 mt-2 text-lg">Export comprehensive teacher data and assignments</p>
+                </div>
+                <a href="/Admin/Dashboard" 
+                   class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold px-6 py-3 rounded-xl transition duration-300 flex items-center">
+                    ← Back
+                </a>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-red-800 dark:text-red-200 p-6 rounded-xl mb-8 shadow-lg animate-fade-in">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-3">❌</span>
+                    <p class="font-semibold text-lg">@Model.ErrorMessage</p>
+                </div>
+            </div>
+        }
+
+        @if (Model.Teacher != null)
+        {
+            <!-- Enhanced Teacher Information Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 border-l-4 border-indigo-500 animate-fade-in hover:shadow-2xl transition-shadow duration-300">
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">👨‍🏫</span>
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Teacher Information</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-750 p-5 rounded-xl border border-indigo-100 dark:border-gray-600">
+                        <div class="flex items-center mb-2">
+                            <span class="text-xl mr-2">👤</span>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Name</p>
+                        </div>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white">@Model.Teacher.User.FullName</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-750 p-5 rounded-xl border border-indigo-100 dark:border-gray-600">
+                        <div class="flex items-center mb-2">
+                            <span class="text-xl mr-2">📧</span>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Email</p>
+                        </div>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white break-all">@Model.Teacher.User.Email</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-750 p-5 rounded-xl border border-indigo-100 dark:border-gray-600">
+                        <div class="flex items-center mb-2">
+                            <span class="text-xl mr-2">🆔</span>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Teacher ID</p>
+                        </div>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white">@Model.Teacher.Id</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-750 p-5 rounded-xl border border-indigo-100 dark:border-gray-600">
+                        <div class="flex items-center mb-2">
+                            <span class="text-xl mr-2">🎓</span>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Designation</p>
+                        </div>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white">@(Model.Teacher.Designation ?? "N/A")</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Data Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl p-8 text-white animate-fade-in">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-5xl">📚</span>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-5xl font-bold mb-2">@Model.TeacherCourses.Count</p>
+                    <p class="text-xl font-semibold text-blue-100">Assigned Courses</p>
+                </div>
+                <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-xl p-8 text-white animate-fade-in" style="animation-delay: 0.1s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-5xl">📅</span>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-5xl font-bold mb-2">@Model.TimetableRules.Count</p>
+                    <p class="text-xl font-semibold text-green-100">Timetable Rules</p>
+                </div>
+                <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-8 text-white animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-5xl">🎯</span>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-5xl font-bold mb-2">@Model.Lectures.Count</p>
+                    <p class="text-xl font-semibold text-purple-100">Generated Lectures</p>
+                </div>
+            </div>
+
+            @if (Model.TeacherCourses.Any())
+            {
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 animate-fade-in hover:shadow-2xl transition-shadow duration-300">
+                    <div class="flex items-center mb-6">
+                        <span class="text-3xl mr-3">📖</span>
+                        <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Assigned Courses</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Course</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Section</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Badge</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Timetable Rules</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach (var tc in Model.TeacherCourses)
+                                {
+                                    <tr class="hover:bg-indigo-50 dark:hover:bg-gray-750 transition-colors duration-150">
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="font-bold text-indigo-600 dark:text-indigo-400">@tc.Course.Code</span><br />
+                                            <span class="text-gray-600 dark:text-gray-400">@tc.Course.Title</span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-semibold text-gray-800 dark:text-white">@tc.Section.Name</td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-semibold">
+                                                @tc.Section.Badge.Name
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full font-bold">
+                                                @tc.TimetableRules.Count
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            @if (Model.TimetableRules.Any())
+            {
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 animate-fade-in hover:shadow-2xl transition-shadow duration-300">
+                    <div class="flex items-center mb-6">
+                        <span class="text-3xl mr-3">⏰</span>
+                        <h2 class="text-2xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">Timetable Rules</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Course</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Section</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Days</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Time</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Duration</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Room</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach (var rule in Model.TimetableRules)
+                                {
+                                    <tr class="hover:bg-green-50 dark:hover:bg-gray-750 transition-colors duration-150">
+                                        <td class="px-6 py-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400">@rule.TeacherCourse.Course.Code</td>
+                                        <td class="px-6 py-4 text-sm font-semibold text-gray-800 dark:text-white">@rule.TeacherCourse.Section.Name</td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded text-xs font-medium">
+                                                @rule.DaysOfWeek
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-white">@rule.StartTime.ToString(@"hh\:mm")</td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded font-semibold">
+                                                @rule.DurationMinutes min
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">@(rule.Room ?? "N/A")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Lectures.Any())
+            {
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 animate-fade-in hover:shadow-2xl transition-shadow duration-300">
+                    <div class="flex items-center mb-6">
+                        <span class="text-3xl mr-3">📝</span>
+                        <h2 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Generated Lectures <span class="text-base text-gray-500">(First 20)</span></h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Course</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Section</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Start Time</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">End Time</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Room</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach (var lecture in Model.Lectures.Take(20))
+                                {
+                                    <tr class="hover:bg-purple-50 dark:hover:bg-gray-750 transition-colors duration-150">
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="font-semibold text-gray-800 dark:text-white">@lecture.StartDateTime.ToString("ddd, MMM dd")</span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-bold text-indigo-600 dark:text-indigo-400">@lecture.TimetableRule.TeacherCourse.Course.Code</td>
+                                        <td class="px-6 py-4 text-sm font-semibold text-gray-800 dark:text-white">@lecture.TimetableRule.TeacherCourse.Section.Name</td>
+                                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">@lecture.StartDateTime.ToString("hh:mm tt")</td>
+                                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">@lecture.EndDateTime.ToString("hh:mm tt")</td>
+                                        <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">@(lecture.TimetableRule.Room ?? "N/A")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <!-- Modern Export Buttons Section -->
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-850 rounded-2xl shadow-xl p-8 animate-fade-in">
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">📤</span>
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Export Options</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <a href="/Admin/TeacherDataExport/ExportCSV?email=@Model.Teacher.User.Email" 
+                       class="export-btn bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold px-8 py-4 rounded-xl transition duration-300 shadow-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Download CSV Export
+                    </a>
+                    <a href="/Admin/Dashboard" 
+                       class="export-btn bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold px-8 py-4 rounded-xl transition duration-300 shadow-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Return to Dashboard
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

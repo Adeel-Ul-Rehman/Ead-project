@@ -1,0 +1,127 @@
+@model attendenceProject.Pages.Admin.Sections.IndexModel
+
+<div class="space-y-6">
+    <!-- Instructions Card -->
+    <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">📋 CSV Format Instructions</h3>
+        <ul class="space-y-2 text-blue-800 dark:text-blue-200">
+            <li>• Header: <code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">BadgeName,Semester,Session,SectionName</code></li>
+            <li>• Badge must exist in the system</li>
+            <li>• Semester must be between 1-8</li>
+            <li>• Session format: YYYY-YYYY (e.g., 2023-2024)</li>
+            <li>• Each combination of Badge+Semester+Session+SectionName must be unique</li>
+        </ul>
+        <div class="mt-4">
+            <a href="/sample_sections.csv" 
+               class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Download Sample CSV
+            </a>
+        </div>
+    </div>
+
+    @if (Model.ValidationResult != null)
+    {
+        <!-- Validation Results -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            @if (Model.ValidationErrors?.Any() == true)
+            {
+            <!-- Errors -->
+            <div class="bg-red-50 dark:bg-red-900 border-l-4 border-red-500 p-6">
+                <div class="flex items-center mb-4">
+                    <svg class="w-6 h-6 text-red-600 dark:text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-red-800 dark:text-red-200">Validation Errors (@Model.ValidationErrors.Count)</h3>
+                </div>
+                <ul class="space-y-2 ml-9">
+                    @foreach (var error in Model.ValidationErrors)
+                    {
+                        <li class="text-red-700 dark:text-red-300">@error</li>
+                    }
+                </ul>
+            </div>
+            }
+
+            @if (Model.ValidatedSections?.Any() == true)
+            {
+                <!-- Valid Sections Preview -->
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-green-700 dark:text-green-300 mb-4">
+                        ✓ Valid Sections (@Model.ValidatedSections.Count) - Ready to Import
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">Badge</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">Section</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">Semester</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">Session</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+                                @foreach (var sec in Model.ValidatedSections)
+                                {
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                                @sec.BadgeName
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">@sec.SectionName</td>
+                                        <td class="px-6 py-4 text-center">@sec.Semester</td>
+                                        <td class="px-6 py-4 text-center text-gray-600 dark:text-gray-400">@sec.Session</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Import Button -->
+                    <form method="post" asp-page-handler="Import" class="mt-6">
+                        <input type="hidden" name="tab" value="import" />
+                        <button type="submit" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Import @Model.ValidatedSections.Count Sections
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+
+        <!-- Try Again Button -->
+        <a href="?tab=import" 
+           class="block text-center bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-lg transition duration-200">
+            Upload Different File
+        </a>
+    }
+    else
+    {
+        <!-- Upload Form -->
+        <form method="post" asp-page-handler="ValidateImport" enctype="multipart/form-data" class="space-y-6">
+            <input type="hidden" name="tab" value="import" />
+            
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Select CSV File <span class="text-red-500">*</span>
+                </label>
+                <input type="file" asp-for="ImportFile" accept=".csv" required
+                       class="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-orange-600 file:text-white hover:file:bg-orange-700">
+            </div>
+
+            <button type="submit" 
+                    class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Validate CSV
+            </button>
+        </form>
+    }
+</div>

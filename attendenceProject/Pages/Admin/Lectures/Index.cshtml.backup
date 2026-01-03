@@ -1,0 +1,153 @@
+@page
+@model attendenceProject.Pages.Admin.Lectures.IndexModel
+@{
+    ViewData["Title"] = "Manage Lectures";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Manage Lectures</h1>
+        <div class="flex gap-2">
+            <a href="/Admin/Lectures/Create" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+                ➕ Create Single Lecture
+            </a>
+            <a href="/Admin/BulkOperations/GenerateLectures" class="bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+                ⚡ Generate Bulk Lectures
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 p-4 rounded-lg mb-6">
+            <p class="font-semibold">✓ @TempData["Success"]</p>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-4 rounded-lg mb-6">
+            <p class="font-semibold">❌ @TempData["Error"]</p>
+        </div>
+    }
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Course</label>
+                <select name="courseId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                    <option value="">All Courses</option>
+                    @foreach (var course in Model.AllCourses)
+                    {
+                        <option value="@course.Id" selected="@(Model.CourseFilter == course.Id)">@course.Code - @course.Title</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Section</label>
+                <select name="sectionId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                    <option value="">All Sections</option>
+                    @foreach (var sec in Model.AllSections)
+                    {
+                        <option value="@sec.Id" selected="@(Model.SectionFilter == sec.Id)">@sec.Badge.Name - @sec.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
+                <select name="dateRange" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                    <option value="all" selected="@(Model.DateRangeFilter == "all")">All Dates</option>
+                    <option value="today" selected="@(Model.DateRangeFilter == "today")">Today</option>
+                    <option value="week" selected="@(Model.DateRangeFilter == "week")">This Week</option>
+                    <option value="month" selected="@(Model.DateRangeFilter == "month")">This Month</option>
+                    <option value="future" selected="@(Model.DateRangeFilter == "future")">Future Only</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">&nbsp;</label>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-300">
+                    🔍 Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lectures Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+            <h2 class="text-xl font-bold">All Lectures (@Model.Lectures.Count total)</h2>
+        </div>
+
+        @if (Model.Lectures.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Date & Time</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Course</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Section</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Teacher</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Room</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Type</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach (var lecture in Model.Lectures)
+                        {
+                            var isPast = lecture.EndDateTime < DateTime.Now;
+                            <tr class="@(isPast ? "bg-gray-50 dark:bg-gray-900 opacity-60" : "")">
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-semibold text-gray-800 dark:text-white">@lecture.StartDateTime.ToString("ddd, MMM dd yyyy")</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">@lecture.StartDateTime.ToString("hh:mm tt") - @lecture.EndDateTime.ToString("hh:mm tt")</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-semibold text-gray-800 dark:text-white">@lecture.TimetableRule.TeacherCourse.Course.Code</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">@lecture.TimetableRule.TeacherCourse.Course.Title</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-semibold">
+                                        @lecture.TimetableRule.TeacherCourse.Section.Badge.Name - @lecture.TimetableRule.TeacherCourse.Section.Name
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">
+                                    @lecture.TimetableRule.TeacherCourse.Teacher.User.FullName
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">@(lecture.TimetableRule.Room ?? "N/A")</td>
+                                <td class="px-6 py-4">
+                                    @if (!string.IsNullOrEmpty(lecture.TimetableRule.LectureType))
+                                    {
+                                        <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded text-xs">
+                                            @lecture.TimetableRule.LectureType
+                                        </span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex gap-2">
+                                        <a href="/Admin/Lectures/Edit?id=@lecture.Id" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 font-semibold text-sm">Edit</a>
+                                        <form method="post" asp-page-handler="Delete" asp-route-id="@lecture.Id" class="inline" onsubmit="return confirm('Delete this lecture?');">
+                                            <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 font-semibold text-sm">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-12 text-center">
+                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p class="text-gray-600 dark:text-gray-400 text-lg mb-4">No lectures found</p>
+                <p class="text-gray-500 dark:text-gray-500 text-sm">Create individual lectures or generate them in bulk from timetable rules.</p>
+            </div>
+        }
+    </div>
+</div>

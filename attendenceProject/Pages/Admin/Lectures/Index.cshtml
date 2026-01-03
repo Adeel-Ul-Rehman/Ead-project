@@ -1,0 +1,468 @@
+@page
+@model attendenceProject.Pages.Admin.Lectures.IndexModel
+@{
+    ViewData["Title"] = "Manage Lectures";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+    .lecture-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .lecture-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+<!-- Success/Error Messages -->
+@if (TempData["Success"] != null)
+{
+    <div class="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border-l-4 border-green-500 p-4 mb-6 rounded-lg shadow-md animate-fade-in">
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-green-700 dark:text-green-200 font-medium">@TempData["Success"]</p>
+        </div>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 border-l-4 border-red-500 p-4 mb-6 rounded-lg shadow-md animate-fade-in">
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-red-700 dark:text-red-200 font-medium">@TempData["Error"]</p>
+        </div>
+    </div>
+}
+
+<!-- Header Section -->
+<div class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                <span class="text-5xl">📅</span>
+                <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Manage Lectures</span>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">Schedule and manage lecture sessions</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="/Admin/Lectures/Create" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create Single
+            </a>
+            <a href="/Admin/BulkOperations/GenerateLectures" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Generate Bulk
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+    <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg p-4 sm:p-6 text-white animate-fade-in">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-indigo-100 text-sm mb-1">Total Lectures</p>
+                <p class="text-2xl sm:text-3xl font-bold">@Model.TotalLectures</p>
+            </div>
+            <svg class="w-10 h-10 sm:w-12 sm:h-12 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-4 sm:p-6 text-white animate-fade-in" style="animation-delay: 0.1s">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-purple-100 text-sm mb-1">Today's Lectures</p>
+                <p class="text-2xl sm:text-3xl font-bold">@Model.TodayLectures</p>
+            </div>
+            <svg class="w-10 h-10 sm:w-12 sm:h-12 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-4 sm:p-6 text-white animate-fade-in" style="animation-delay: 0.2s">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-green-100 text-sm mb-1">Upcoming</p>
+                <p class="text-2xl sm:text-3xl font-bold">@Model.UpcomingLectures</p>
+            </div>
+            <svg class="w-10 h-10 sm:w-12 sm:h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg p-4 sm:p-6 text-white animate-fade-in" style="animation-delay: 0.3s">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-orange-100 text-sm mb-1">Completed</p>
+                <p class="text-2xl sm:text-3xl font-bold">@Model.CompletedLectures</p>
+            </div>
+            <svg class="w-10 h-10 sm:w-12 sm:h-12 text-orange-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 mb-6">
+    <form method="get" id="filterForm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
+                <input type="text" name="searchTerm" value="@Model.SearchTerm" 
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                       placeholder="Course or teacher...">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Course</label>
+                <select name="courseId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <option value="">All Courses</option>
+                    @foreach (var course in Model.AllCourses)
+                    {
+                        <option value="@course.Id" selected="@(Model.CourseFilter == course.Id)">@course.Code - @course.Title</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Section</label>
+                <select name="sectionId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <option value="">All Sections</option>
+                    @foreach (var sec in Model.AllSections)
+                    {
+                        <option value="@sec.Id" selected="@(Model.SectionFilter == sec.Id)">@sec.Badge.Name - @sec.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Teacher</label>
+                <select name="teacherId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <option value="">All Teachers</option>
+                    @foreach (var teacher in Model.AllTeachers)
+                    {
+                        <option value="@teacher.Id" selected="@(Model.TeacherFilter == teacher.Id)">@teacher.User.FullName</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <option value="all" selected="@(Model.StatusFilter == "all")">All Status</option>
+                    <option value="scheduled" selected="@(Model.StatusFilter == "scheduled")">Scheduled</option>
+                    <option value="ongoing" selected="@(Model.StatusFilter == "ongoing")">Ongoing</option>
+                    <option value="completed" selected="@(Model.StatusFilter == "completed")">Completed</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
+                <select name="dateRange" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <option value="all" selected="@(Model.DateRangeFilter == "all")">All Dates</option>
+                    <option value="today" selected="@(Model.DateRangeFilter == "today")">Today</option>
+                    <option value="week" selected="@(Model.DateRangeFilter == "week")">This Week</option>
+                    <option value="month" selected="@(Model.DateRangeFilter == "month")">This Month</option>
+                    <option value="future" selected="@(Model.DateRangeFilter == "future")">Future Only</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <button type="submit" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition duration-300 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Search
+            </button>
+            <a href="/Admin/Lectures" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition duration-300 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Reset
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- View Toggle -->
+<div class="mb-6 flex justify-between items-center">
+    <div class="flex gap-2">
+        <button id="calendarViewBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium transition hover:bg-indigo-700">
+            📅 Calendar View
+        </button>
+        <button id="listViewBtn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition hover:bg-gray-300 dark:hover:bg-gray-600">
+            📋 List View
+        </button>
+    </div>
+</div>
+
+<!-- Calendar Week View -->
+<div id="calendarView" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
+    <div class="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+        <h2 class="text-xl font-bold">
+            Week of @Model.CalendarStartDate.ToString("MMM dd") - @Model.CalendarEndDate.ToString("MMM dd, yyyy")
+        </h2>
+    </div>
+    
+    <div class="grid grid-cols-7 gap-0 border-b dark:border-gray-700">
+        @foreach (var day in Model.CalendarWeekDays)
+        {
+            <div class="@(day.IsToday ? "bg-indigo-50 dark:bg-indigo-900" : "") border-r dark:border-gray-700 last:border-r-0">
+                <div class="p-3 text-center border-b dark:border-gray-700">
+                    <div class="text-xs font-semibold text-gray-600 dark:text-gray-400">@day.DayName</div>
+                    <div class="@(day.IsToday ? "bg-indigo-600 text-white rounded-full w-8 h-8 mx-auto flex items-center justify-center mt-1" : "text-lg font-bold text-gray-800 dark:text-white mt-1")">
+                        @day.DayNumber
+                    </div>
+                </div>
+                <div class="p-2 min-h-[200px] space-y-2">
+                    @if (day.Lectures.Any())
+                    {
+                        @foreach (var lecture in day.Lectures)
+                        {
+                            var statusColor = lecture.Status == "completed" ? "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" : 
+                                            (lecture.Status == "ongoing" ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-l-4 border-green-500" : 
+                                            "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-l-4 border-blue-500");
+                            
+                            <div class="@statusColor p-2 rounded text-xs lecture-card" 
+                                 onclick="showLectureDetails(@lecture.Id, '@lecture.CourseCode', '@lecture.CourseTitle', '@lecture.TeacherName', '@lecture.StartTime.ToString("hh:mm tt")', '@lecture.EndTime.ToString("hh:mm tt")', '@lecture.Room', '@lecture.Status')">
+                                <div class="font-bold">@lecture.CourseCode</div>
+                                <div class="text-xs mt-1">@lecture.StartTime.ToString("hh:mm tt")</div>
+                                <div class="text-xs truncate">@lecture.TeacherName</div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-gray-400 dark:text-gray-600 text-xs py-8">
+                            No lectures
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- List/Table View -->
+<div id="listView" style="display:none;" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+        <h2 class="text-xl font-bold">All Lectures (@Model.Lectures.Count total)</h2>
+    </div>
+
+    @if (Model.Lectures.Any())
+    {
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-bold">Date & Time</th>
+                        <th class="px-4 py-3 text-left text-sm font-bold">Course</th>
+                        <th class="px-4 py-3 text-left text-sm font-bold">Section</th>
+                        <th class="px-4 py-3 text-left text-sm font-bold">Teacher</th>
+                        <th class="px-4 py-3 text-left text-sm font-bold">Room</th>
+                        <th class="px-4 py-3 text-left text-sm font-bold">Status</th>
+                        <th class="px-4 py-3 text-center text-sm font-bold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach (var lecture in Model.Lectures)
+                    {
+                        var isPast = lecture.EndDateTime < DateTime.Now;
+                        var isOngoing = lecture.StartDateTime <= DateTime.Now && lecture.EndDateTime >= DateTime.Now;
+                        var status = isPast ? "Completed" : (isOngoing ? "Ongoing" : "Scheduled");
+                        var statusBadge = isPast ? "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300" : 
+                                        (isOngoing ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200" : 
+                                        "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200");
+                        
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
+                            <td class="px-4 py-3">
+                                <div class="text-sm font-semibold text-gray-800 dark:text-white">@lecture.StartDateTime.ToString("ddd, MMM dd yyyy")</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">@lecture.StartDateTime.ToString("hh:mm tt") - @lecture.EndDateTime.ToString("hh:mm tt")</div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="text-sm font-semibold text-gray-800 dark:text-white">@lecture.TimetableRule.TeacherCourse.Course.Code</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">@lecture.TimetableRule.TeacherCourse.Course.Title</div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 rounded-full text-sm font-semibold">
+                                    @lecture.TimetableRule.TeacherCourse.Section.Badge.Name - @lecture.TimetableRule.TeacherCourse.Section.Name
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-white">
+                                @lecture.TimetableRule.TeacherCourse.Teacher.User.FullName
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-white">@(lecture.TimetableRule.Room ?? "N/A")</td>
+                            <td class="px-4 py-3">
+                                <span class="px-3 py-1 @statusBadge rounded-full text-xs font-semibold">
+                                    @status
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <a href="/Admin/Lectures/Edit?id=@lecture.Id" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 font-semibold text-sm">Edit</a>
+                                    <button type="button" onclick="openDeleteModal(@lecture.Id)" class="text-red-600 hover:text-red-800 dark:text-red-400 font-semibold text-sm">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="p-12 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="text-gray-600 dark:text-gray-400 text-lg mb-4">No lectures found</p>
+            <p class="text-gray-500 dark:text-gray-500 text-sm mb-6">Create individual lectures or generate them in bulk from timetable rules.</p>
+            <div class="flex gap-3 justify-center">
+                <a href="/Admin/Lectures/Create" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+                    ➕ Create Single Lecture
+                </a>
+                <a href="/Admin/BulkOperations/GenerateLectures" class="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+                    ⚡ Generate Bulk Lectures
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Lecture Details Modal -->
+<div id="lectureDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-md w-full mx-4 animate-fade-in">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Lecture Details</h3>
+        </div>
+        <div class="p-6 space-y-3">
+            <div>
+                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">Course:</span>
+                <p class="text-gray-900 dark:text-white font-semibold" id="modalCourseCode"></p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm" id="modalCourseTitle"></p>
+            </div>
+            <div>
+                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">Teacher:</span>
+                <p class="text-gray-900 dark:text-white" id="modalTeacher"></p>
+            </div>
+            <div>
+                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">Time:</span>
+                <p class="text-gray-900 dark:text-white" id="modalTime"></p>
+            </div>
+            <div>
+                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">Room:</span>
+                <p class="text-gray-900 dark:text-white" id="modalRoom"></p>
+            </div>
+            <div>
+                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">Status:</span>
+                <p id="modalStatus"></p>
+            </div>
+        </div>
+        <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-end">
+            <a id="modalEditLink" href="#" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition">Edit</a>
+            <button onclick="closeLectureDetails()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg transition">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-md w-full mx-4 animate-fade-in">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Confirm Delete</h3>
+        </div>
+        <div class="p-6">
+            <p class="text-gray-700 dark:text-gray-300">Are you sure you want to delete this lecture? This action cannot be undone.</p>
+        </div>
+        <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-end">
+            <button onclick="closeDeleteModal()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg transition">Cancel</button>
+            <form id="deleteForm" method="post" asp-page-handler="Delete" class="inline">
+                <input type="hidden" id="deleteId" name="id" value="" />
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // View toggle functionality
+    const calendarViewBtn = document.getElementById('calendarViewBtn');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const calendarView = document.getElementById('calendarView');
+    const listView = document.getElementById('listView');
+
+    calendarViewBtn.addEventListener('click', () => {
+        calendarView.style.display = 'block';
+        listView.style.display = 'none';
+        calendarViewBtn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+        calendarViewBtn.classList.add('bg-indigo-600', 'text-white');
+        listViewBtn.classList.remove('bg-indigo-600', 'text-white');
+        listViewBtn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+    });
+
+    listViewBtn.addEventListener('click', () => {
+        calendarView.style.display = 'none';
+        listView.style.display = 'block';
+        listViewBtn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+        listViewBtn.classList.add('bg-indigo-600', 'text-white');
+        calendarViewBtn.classList.remove('bg-indigo-600', 'text-white');
+        calendarViewBtn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+    });
+
+    // Lecture details modal
+    function showLectureDetails(id, courseCode, courseTitle, teacher, startTime, endTime, room, status) {
+        document.getElementById('modalCourseCode').textContent = courseCode;
+        document.getElementById('modalCourseTitle').textContent = courseTitle;
+        document.getElementById('modalTeacher').textContent = teacher;
+        document.getElementById('modalTime').textContent = startTime + ' - ' + endTime;
+        document.getElementById('modalRoom').textContent = room;
+        
+        const statusEl = document.getElementById('modalStatus');
+        let statusClass = status === 'completed' ? 'bg-gray-100 text-gray-800' : 
+                         (status === 'ongoing' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800');
+        statusEl.innerHTML = '<span class="px-3 py-1 ' + statusClass + ' rounded-full text-xs font-semibold">' + 
+                            status.charAt(0).toUpperCase() + status.slice(1) + '</span>';
+        
+        document.getElementById('modalEditLink').href = '/Admin/Lectures/Edit?id=' + id;
+        document.getElementById('lectureDetailsModal').classList.remove('hidden');
+    }
+
+    function closeLectureDetails() {
+        document.getElementById('lectureDetailsModal').classList.add('hidden');
+    }
+
+    // Delete modal
+    function openDeleteModal(id) {
+        document.getElementById('deleteId').value = id;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+</script>

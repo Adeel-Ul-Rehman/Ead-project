@@ -1,0 +1,218 @@
+@page
+@model attendenceProject.Pages.Admin.GenerateLectureCSVModel
+@{
+    ViewData["Title"] = "Generate Lecture CSV";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    
+    .gradient-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .gradient-info {
+        background: linear-gradient(135deg, #667eea 0%, #4c51bf 100%);
+    }
+    
+    .gradient-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: all 0.3s ease;
+    }
+    
+    .gradient-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .icon-input {
+        position: relative;
+    }
+    
+    .icon-input svg {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .icon-input input {
+        padding-left: 44px;
+    }
+</style>
+
+<div class="container mx-auto px-4 py-8 fade-in">
+    <div class="max-w-4xl mx-auto">
+        <!-- Modern Gradient Header -->
+        <div class="gradient-header rounded-2xl shadow-2xl p-8 mb-8 text-white">
+            <div class="flex items-center gap-4 mb-3">
+                <div class="text-5xl">📥</div>
+                <div>
+                    <h1 class="text-4xl font-bold">Generate Lecture CSV</h1>
+                    <p class="text-blue-100 mt-2">Create bulk import templates from timetable rules</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Info Banner -->
+        <div class="gradient-info rounded-xl shadow-lg p-6 mb-8 text-white fade-in">
+            <div class="flex items-start gap-4">
+                <div class="text-3xl">💡</div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">Purpose</h3>
+                    <p class="text-blue-100">
+                        This tool generates a CSV file with lecture schedule templates based on a teacher's timetable rules. 
+                        You can then import this CSV to create actual lectures in bulk.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professional Form Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span>Generate CSV Template</span>
+            </h2>
+
+            <form method="post">
+                <!-- Teacher Email with Icon -->
+                <div class="mb-6">
+                    <label for="teacherEmail" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        Teacher Email <span class="text-red-500">*</span>
+                    </label>
+                    <div class="icon-input">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <input asp-for="Input.TeacherEmail" type="email" placeholder="teacher@example.com" 
+                               class="w-full px-4 py-3 pl-12 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200" />
+                    </div>
+                    <span asp-validation-for="Input.TeacherEmail" class="text-red-500 text-sm mt-1 block"></span>
+                </div>
+
+                <!-- Date Range -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <label for="startDate" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            Start Date <span class="text-red-500">*</span>
+                        </label>
+                        <input asp-for="Input.StartDate" type="date" 
+                               class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200" />
+                        <span asp-validation-for="Input.StartDate" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+
+                    <div>
+                        <label for="endDate" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            End Date <span class="text-red-500">*</span>
+                        </label>
+                        <input asp-for="Input.EndDate" type="date" 
+                               class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200" />
+                        <span asp-validation-for="Input.EndDate" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+                </div>
+
+                <!-- Modern Gradient Submit Button -->
+                <button type="submit" class="gradient-button w-full text-white font-bold px-8 py-4 rounded-xl shadow-lg flex items-center justify-center gap-3 text-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Generate & Download CSV
+                </button>
+            </form>
+        </div>
+
+        <!-- How to Use Section -->
+        <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg p-8 mb-8 fade-in">
+            <h3 class="font-bold text-gray-800 dark:text-white mb-4 text-xl flex items-center gap-3">
+                <span class="text-3xl">📚</span>
+                <span>How to Use</span>
+            </h3>
+            <ol class="space-y-3 text-gray-700 dark:text-gray-300">
+                <li class="flex items-start gap-3">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold flex-shrink-0">1</span>
+                    <span>Enter the teacher's email address (e.g., dominoriderexpense@gmail.com)</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold flex-shrink-0">2</span>
+                    <span>Select the date range for which you want to generate lectures</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold flex-shrink-0">3</span>
+                    <span>Click "Generate & Download CSV" - a CSV file will be created</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold flex-shrink-0">4</span>
+                    <span>The CSV contains lecture schedule based on the teacher's timetable rules</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold flex-shrink-0">5</span>
+                    <span>Each row = one lecture instance with: Date, Time, Course, Section, Room</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold flex-shrink-0">6</span>
+                    <span>You can edit the CSV in Excel before importing</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold flex-shrink-0">7</span>
+                    <span>Use the bulk import tool to create lectures from the CSV</span>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Important Notes -->
+        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-l-4 border-yellow-500 rounded-xl shadow-lg p-6 fade-in">
+            <h3 class="font-bold text-yellow-800 dark:text-yellow-200 mb-3 text-lg flex items-center gap-3">
+                <span class="text-2xl">⚠️</span>
+                <span>Important Notes</span>
+            </h3>
+            <ul class="space-y-2 text-yellow-700 dark:text-yellow-300">
+                <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Teacher must have assigned courses and timetable rules before generating CSV</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Holidays will be automatically excluded from the generated lectures</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Only lectures within the timetable rule's date range will be generated</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>The CSV is a template - actual lectures are created when you import it</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

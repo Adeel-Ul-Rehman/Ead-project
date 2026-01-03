@@ -1,0 +1,6 @@
+Code,Title,CreditHours,IsLab
+CS101,Introduction to Programming,3,false
+CS101L,Programming Lab,1,true
+CS102,Object Oriented Programming,3,theory
+CS102L,OOP Lab,1,lab
+CS201,Data Structures,3,false

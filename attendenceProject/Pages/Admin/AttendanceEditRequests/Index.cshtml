@@ -1,0 +1,462 @@
+@page
+@model attendenceProject.Pages.Admin.AttendanceEditRequests.IndexModel
+@{
+    ViewData["Title"] = "Attendance Requests";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    .gradient-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .stat-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Modern Header with Gradient -->
+    <div class="gradient-header rounded-2xl shadow-xl p-8 mb-8 text-white">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">🗂️ Attendance Request Management</h1>
+                <p class="text-purple-100 text-lg">Unified view of all extension and edit requests</p>
+            </div>
+            @if ((Model.PendingEditRequests + Model.PendingExtensionRequests) > 0)
+            {
+                <div class="bg-red-500 text-white px-6 py-3 rounded-full font-bold animate-pulse text-xl shadow-lg">
+                    @(Model.PendingEditRequests + Model.PendingExtensionRequests) Pending
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Enhanced Statistics Cards - 2 Rows -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Row 1 -->
+        <div class="stat-card bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-4xl font-bold mb-1">@(Model.PendingEditRequests + Model.PendingExtensionRequests)</div>
+                    <div class="text-sm opacity-90 font-semibold">⏳ Pending Total</div>
+                </div>
+                <div class="text-6xl opacity-30">⏳</div>
+            </div>
+        </div>
+
+        <div class="stat-card bg-gradient-to-br from-green-400 to-green-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-4xl font-bold mb-1">@(Model.ApprovedEditRequests + Model.ApprovedExtensionRequests)</div>
+                    <div class="text-sm opacity-90 font-semibold">✅ Approved Total</div>
+                </div>
+                <div class="text-6xl opacity-30">✅</div>
+            </div>
+        </div>
+
+        <div class="stat-card bg-gradient-to-br from-red-400 to-red-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-4xl font-bold mb-1">@(Model.RejectedEditRequests + Model.RejectedExtensionRequests)</div>
+                    <div class="text-sm opacity-90 font-semibold">❌ Rejected Total</div>
+                </div>
+                <div class="text-6xl opacity-30">❌</div>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="stat-card bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-4xl font-bold mb-1">@Model.TotalExtensionRequests</div>
+                    <div class="text-sm opacity-90 font-semibold">🔄 Extension Requests</div>
+                    <div class="text-xs opacity-75 mt-1">Pending: @Model.PendingExtensionRequests</div>
+                </div>
+                <div class="text-6xl opacity-30">🔄</div>
+            </div>
+        </div>
+
+        <div class="stat-card bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-4xl font-bold mb-1">@Model.TotalEditRequests</div>
+                    <div class="text-sm opacity-90 font-semibold">✏️ Edit Requests</div>
+                    <div class="text-xs opacity-75 mt-1">Pending: @Model.PendingEditRequests</div>
+                </div>
+                <div class="text-6xl opacity-30">✏️</div>
+            </div>
+        </div>
+
+        <div class="stat-card bg-gradient-to-br from-orange-400 to-pink-500 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-4xl font-bold mb-1">@Model.TotalRequestsThisWeek</div>
+                    <div class="text-sm opacity-90 font-semibold">📅 This Week</div>
+                    <div class="text-xs opacity-75 mt-1">Last 7 days</div>
+                </div>
+                <div class="text-6xl opacity-30">📅</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+        <!-- Enhanced Search & Filter Section -->
+        <div class="bg-gray-50 dark:bg-gray-900 p-6 border-b dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">🔍 Search & Filter</h3>
+            <form method="get" class="space-y-4">
+                <input type="hidden" name="tab" value="@Model.ActiveTab" />
+                
+                <!-- First Row: Search, Request Type, Teacher -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
+                        <input type="text" name="searchTerm" value="@Model.SearchTerm" 
+                               placeholder="Teacher, student, course, reason..." 
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Request Type</label>
+                        <select name="requestType" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
+                            <option value="all" selected="@(Model.RequestType == "all")">📋 All Requests</option>
+                            <option value="extension" selected="@(Model.RequestType == "extension")">🔄 Extension Requests</option>
+                            <option value="edit" selected="@(Model.RequestType == "edit")">✏️ Edit Requests</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filter by Teacher</label>
+                        <select name="teacherId" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
+                            <option value="">All Teachers</option>
+                            @foreach (var teacher in Model.Teachers)
+                            {
+                                <option value="@teacher.Id" selected="@(Model.SelectedTeacherId == teacher.Id)">@teacher.User.FullName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Second Row: Date Range and Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
+                        <input type="date" name="startDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")"
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label>
+                        <input type="date" name="endDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")"
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
+                    </div>
+
+                    <div class="md:col-span-2 flex items-end gap-2">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center gap-2 shadow-md">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Apply Filters
+                        </button>
+
+                        @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.SelectedTeacherId.HasValue || Model.StartDate.HasValue || Model.EndDate.HasValue || Model.RequestType != "all")
+                        {
+                            <a href="?tab=@Model.ActiveTab" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-lg transition duration-200 flex items-center gap-2 shadow-md">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Reset
+                            </a>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Status Tabs -->
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="flex -mb-px px-6" aria-label="Tabs">
+                <a href="?tab=all&requestType=@Model.RequestType&searchTerm=@Model.SearchTerm&teacherId=@Model.SelectedTeacherId&startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")"
+                   class="@(Model.ActiveTab == "all" ? "border-purple-500 text-purple-600 bg-purple-50 dark:bg-purple-900/20" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400") whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-all duration-200">
+                    📋 All (@Model.AllRequests.Count)
+                </a>
+                <a href="?tab=pending&requestType=@Model.RequestType&searchTerm=@Model.SearchTerm&teacherId=@Model.SelectedTeacherId&startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")"
+                   class="@(Model.ActiveTab == "pending" ? "border-yellow-500 text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400") whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-all duration-200">
+                    ⏳ Pending (@(Model.PendingEditRequests + Model.PendingExtensionRequests))
+                </a>
+                <a href="?tab=approved&requestType=@Model.RequestType&searchTerm=@Model.SearchTerm&teacherId=@Model.SelectedTeacherId&startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")"
+                   class="@(Model.ActiveTab == "approved" ? "border-green-500 text-green-600 bg-green-50 dark:bg-green-900/20" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400") whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-all duration-200">
+                    ✅ Approved (@(Model.ApprovedEditRequests + Model.ApprovedExtensionRequests))
+                </a>
+                <a href="?tab=rejected&requestType=@Model.RequestType&searchTerm=@Model.SearchTerm&teacherId=@Model.SelectedTeacherId&startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")"
+                   class="@(Model.ActiveTab == "rejected" ? "border-red-500 text-red-600 bg-red-50 dark:bg-red-900/20" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400") whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-all duration-200">
+                    ❌ Rejected (@(Model.RejectedEditRequests + Model.RejectedExtensionRequests))
+                </a>
+            </nav>
+        </div>
+
+        <!-- Requests Content -->
+        <div class="p-6">
+            <partial name="_AllRequestsTab" model="Model" />
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Review/Approval Modal -->
+<div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center">
+    <div class="relative mx-auto p-0 border-0 w-11/12 md:w-3/4 lg:w-2/3 shadow-2xl rounded-2xl bg-white dark:bg-gray-800 max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="sticky top-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 rounded-t-2xl z-10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-2xl font-bold" id="modalTitle">Review Request</h3>
+                <button onclick="closeModal()" class="text-white hover:text-gray-200 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Content -->
+        <div class="p-6" id="modalContent">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="sticky bottom-0 bg-gray-50 dark:bg-gray-900 px-6 py-4 rounded-b-2xl border-t dark:border-gray-700 flex justify-end gap-3">
+            <button onclick="closeModal()" class="px-6 py-3 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition duration-200 font-semibold">
+                Cancel
+            </button>
+            <button onclick="submitReview('reject')" class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition duration-200 font-semibold shadow-md">
+                ❌ Reject
+            </button>
+            <button onclick="submitReview('approve')" class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition duration-200 font-semibold shadow-md">
+                ✅ Approve
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal for Processed Requests -->
+<div id="detailsModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center">
+    <div class="relative mx-auto p-0 border-0 w-11/12 md:w-3/4 lg:w-1/2 shadow-2xl rounded-2xl bg-white dark:bg-gray-800 max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6 rounded-t-2xl z-10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-2xl font-bold" id="detailsModalTitle">Request Details</h3>
+                <button onclick="closeDetailsModal()" class="text-white hover:text-gray-200 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Content -->
+        <div class="p-6" id="detailsModalContent">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="sticky bottom-0 bg-gray-50 dark:bg-gray-900 px-6 py-4 rounded-b-2xl border-t dark:border-gray-700 flex justify-end">
+            <button onclick="closeDetailsModal()" class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition duration-200 font-semibold">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openReviewModal(id, requestType, teacherName, courseInfo, sectionInfo, date, reason, extensionType = '') {
+        document.getElementById('modalTitle').innerText = `${requestType === 'edit' ? '✏️ Review Edit Request' : '🔄 Review Extension Request'}`;
+        document.getElementById('modalContent').innerHTML = `
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">Teacher</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">${teacherName}</div>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-purple-600 dark:text-purple-400 mb-1">Request Type</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">${requestType === 'edit' ? 'Edit Request' : 'Extension Request'}</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Course & Section</div>
+                    <div class="font-semibold text-gray-900 dark:text-white">${courseInfo}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">${sectionInfo}</div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Lecture Date</div>
+                    <div class="font-semibold text-gray-900 dark:text-white">${date}</div>
+                </div>
+
+                ${extensionType ? `
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-2">Extension Type</div>
+                    <div class="font-semibold text-gray-900 dark:text-white">${extensionType}</div>
+                </div>
+                ` : ''}
+
+                <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Reason</div>
+                    <div class="text-gray-900 dark:text-white whitespace-pre-wrap">${reason}</div>
+                </div>
+
+                <div>
+                    <label for="adminNotes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Admin Notes (Optional)
+                    </label>
+                    <textarea id="adminNotes" name="adminNotes" rows="4" 
+                              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white" 
+                              placeholder="Add any notes for this decision..."></textarea>
+                </div>
+            </div>
+        `;
+
+        window.currentRequestId = id;
+        window.currentRequestType = requestType;
+        document.getElementById('reviewModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('reviewModal').classList.add('hidden');
+    }
+
+    function openDetailsModal(teacherName, courseInfo, sectionInfo, date, reason, status, processedBy, processedDate, adminNotes, requestType, extensionType = '', extendsUntil = '') {
+        document.getElementById('detailsModalTitle').innerText = `${requestType === 'edit' ? '✏️ Edit Request' : '🔄 Extension Request'} - ${status}`;
+        
+        const statusColor = status === 'Approved' ? 'green' : status === 'Rejected' ? 'red' : 'gray';
+        const statusIcon = status === 'Approved' ? '✅' : status === 'Rejected' ? '❌' : '📋';
+        
+        document.getElementById('detailsModalContent').innerHTML = `
+            <div class="space-y-4">
+                <div class="bg-${statusColor}-50 dark:bg-${statusColor}-900/20 border-l-4 border-${statusColor}-500 p-4 rounded-lg">
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-3">${statusIcon}</span>
+                        <div>
+                            <div class="font-bold text-${statusColor}-800 dark:text-${statusColor}-200">Status: ${status}</div>
+                            ${processedBy ? `<div class="text-sm text-${statusColor}-700 dark:text-${statusColor}-300">Processed by ${processedBy} on ${processedDate}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">Teacher</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">${teacherName}</div>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-purple-600 dark:text-purple-400 mb-1">Request Type</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">${requestType === 'edit' ? 'Edit Request' : 'Extension Request'}</div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Course & Section</div>
+                    <div class="font-semibold text-gray-900 dark:text-white">${courseInfo}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">${sectionInfo}</div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Lecture Date</div>
+                    <div class="font-semibold text-gray-900 dark:text-white">${date}</div>
+                </div>
+
+                ${extensionType ? `
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-2">Extension Type</div>
+                    <div class="font-semibold text-gray-900 dark:text-white">${extensionType}</div>
+                </div>
+                ` : ''}
+
+                ${extendsUntil && status === 'Approved' ? `
+                <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border-l-4 border-green-500">
+                    <div class="text-sm font-medium text-green-800 dark:text-green-300 mb-2">✅ Extended Until</div>
+                    <div class="font-semibold text-gray-900 dark:text-white">${extendsUntil}</div>
+                </div>
+                ` : ''}
+
+                <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                    <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Reason</div>
+                    <div class="text-gray-900 dark:text-white whitespace-pre-wrap">${reason}</div>
+                </div>
+
+                ${adminNotes ? `
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border-l-4 border-yellow-500">
+                    <div class="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-2">📝 Admin Notes</div>
+                    <div class="text-gray-900 dark:text-white whitespace-pre-wrap">${adminNotes}</div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+
+        document.getElementById('detailsModal').classList.remove('hidden');
+    }
+
+    function closeDetailsModal() {
+        document.getElementById('detailsModal').classList.add('hidden');
+    }
+
+    function submitReview(action) {
+        const id = window.currentRequestId;
+        const requestType = window.currentRequestType;
+        const adminNotes = document.getElementById('adminNotes').value;
+
+        const form = document.createElement('form');
+        form.method = 'post';
+        
+        // Use the new handler names: ApproveEdit, RejectEdit, ApproveExtension, RejectExtension
+        const handlerName = action === 'approve' 
+            ? (requestType === 'edit' ? 'ApproveEdit' : 'ApproveExtension')
+            : (requestType === 'edit' ? 'RejectEdit' : 'RejectExtension');
+        
+        form.action = `?handler=${handlerName}`;
+
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'id';
+        idInput.value = id;
+        form.appendChild(idInput);
+
+        if (adminNotes) {
+            const notesInput = document.createElement('input');
+            notesInput.type = 'hidden';
+            notesInput.name = 'adminNotes';
+            notesInput.value = adminNotes;
+            form.appendChild(notesInput);
+        }
+
+        // Add antiforgery token
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        if (token) {
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = token.value;
+            form.appendChild(tokenInput);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // Close modals when clicking outside
+    document.getElementById('reviewModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    document.getElementById('detailsModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDetailsModal();
+        }
+    });
+</script>

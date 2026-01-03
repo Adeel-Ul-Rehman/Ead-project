@@ -1,0 +1,137 @@
+@page
+@model attendenceProject.Pages.Admin.Lectures.EditModel
+@{
+    ViewData["Title"] = "Edit Lecture";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center gap-4 mb-6">
+            <a href="/Admin/Lectures" class="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                ← Back to Lectures
+            </a>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Edit Lecture</h1>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-4 rounded-lg mb-6">
+                <p class="font-semibold mb-2">Please correct the following errors:</p>
+                <ul class="list-disc list-inside">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @if (Model.Lecture.AttendanceRecords.Any())
+        {
+            <div class="bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-600 p-4 rounded-lg mb-6">
+                <p class="text-yellow-800 dark:text-yellow-200">
+                    <strong>⚠️ Warning:</strong> This lecture has @Model.Lecture.AttendanceRecords.Count attendance record(s). Changes may affect existing data.
+                </p>
+            </div>
+        }
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <form method="post">
+                <input type="hidden" asp-for="Input.Id" />
+
+                <!-- Lecture Info (Read-only) -->
+                <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <h3 class="font-bold text-gray-800 dark:text-white mb-3">Lecture Information</h3>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="text-gray-600 dark:text-gray-400">Teacher</p>
+                            <p class="font-semibold text-gray-800 dark:text-white">@Model.Lecture.TimetableRule.TeacherCourse.Teacher.User.FullName</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 dark:text-gray-400">Course</p>
+                            <p class="font-semibold text-gray-800 dark:text-white">@Model.Lecture.TimetableRule.TeacherCourse.Course.Code - @Model.Lecture.TimetableRule.TeacherCourse.Course.Title</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 dark:text-gray-400">Section</p>
+                            <p class="font-semibold text-gray-800 dark:text-white">@Model.Lecture.TimetableRule.TeacherCourse.Section.Badge.Name - @Model.Lecture.TimetableRule.TeacherCourse.Section.Name</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 dark:text-gray-400">Attendance Records</p>
+                            <p class="font-semibold text-gray-800 dark:text-white">@Model.Lecture.AttendanceRecords.Count</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date -->
+                <div class="mb-6">
+                    <label for="lectureDate" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Lecture Date <span class="text-red-500">*</span>
+                    </label>
+                    <input asp-for="Input.LectureDate" type="date" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" />
+                    <span asp-validation-for="Input.LectureDate" class="text-red-500 text-sm"></span>
+                </div>
+
+                <!-- Start Time -->
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label for="startTime" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Start Time <span class="text-red-500">*</span>
+                        </label>
+                        <input asp-for="Input.StartTime" type="time" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" />
+                        <span asp-validation-for="Input.StartTime" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Duration -->
+                    <div>
+                        <label for="durationMinutes" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Duration (minutes) <span class="text-red-500">*</span>
+                        </label>
+                        <input asp-for="Input.DurationMinutes" type="number" min="15" max="300" step="15" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" />
+                        <span asp-validation-for="Input.DurationMinutes" class="text-red-500 text-sm"></span>
+                    </div>
+                </div>
+
+                <!-- Room -->
+                <div class="mb-6">
+                    <label for="room" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Room (Optional)
+                    </label>
+                    <input asp-for="Input.Room" type="text" placeholder="e.g., Room 301, Lab A" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" />
+                </div>
+
+                <!-- Lecture Type -->
+                <div class="mb-6">
+                    <label for="lectureType" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Lecture Type (Optional)
+                    </label>
+                    <select asp-for="Input.LectureType" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                        <option value="">-- Select Type --</option>
+                        <option value="Lecture">Lecture</option>
+                        <option value="Lab">Lab</option>
+                        <option value="Tutorial">Tutorial</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Exam">Exam</option>
+                        <option value="Quiz">Quiz</option>
+                        <option value="Review">Review</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300">
+                        ✓ Update Lecture
+                    </button>
+                    <a href="/Admin/Lectures" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-300 text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

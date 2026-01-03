@@ -1,0 +1,199 @@
+@page
+@model attendenceProject.Pages.Teacher.SpecialSessions.IndexModel
+@{
+    ViewData["Title"] = "Special Sessions";
+}
+
+<div class="mb-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+                <span class="text-4xl">⚡</span>
+                <span>Special Sessions</span>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Create and manage extra classes, quizzes, tests, and workshops</p>
+        </div>
+        <a href="/Teacher/SpecialSessions/Create" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition duration-300 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Create Special Session
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 p-4 rounded-lg mb-6 animate-fade-in">
+        <div class="flex items-center">
+            <span class="text-2xl mr-3">✅</span>
+            <p class="text-green-800 dark:text-green-200 font-medium">@TempData["Success"]</p>
+        </div>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg mb-6 animate-fade-in">
+        <div class="flex items-center">
+            <span class="text-2xl mr-3">❌</span>
+            <p class="text-red-800 dark:text-red-200 font-medium">@TempData["Error"]</p>
+        </div>
+    </div>
+}
+
+<!-- Filters -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+    <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Session Type</label>
+            <select name="type" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" onchange="this.form.submit()">
+                <option value="all" selected="@(string.IsNullOrEmpty(Model.FilterType) || Model.FilterType == "all")">All Types</option>
+                <option value="Quiz" selected="@(Model.FilterType == "Quiz")">Quiz</option>
+                <option value="Test" selected="@(Model.FilterType == "Test")">Test</option>
+                <option value="Lab" selected="@(Model.FilterType == "Lab")">Lab Session</option>
+                <option value="Practical" selected="@(Model.FilterType == "Practical")">Practical</option>
+                <option value="Workshop" selected="@(Model.FilterType == "Workshop")">Workshop</option>
+                <option value="GuestLecture" selected="@(Model.FilterType == "GuestLecture")">Guest Lecture</option>
+                <option value="Review" selected="@(Model.FilterType == "Review")">Review Session</option>
+                <option value="MakeUp" selected="@(Model.FilterType == "MakeUp")">Make-up Class</option>
+                <option value="Extra" selected="@(Model.FilterType == "Extra")">Extra Class</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Status</label>
+            <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" onchange="this.form.submit()">
+                <option value="all" selected="@(string.IsNullOrEmpty(Model.FilterStatus) || Model.FilterStatus == "all")">All Status</option>
+                <option value="Scheduled" selected="@(Model.FilterStatus == "Scheduled")">Scheduled</option>
+                <option value="Completed" selected="@(Model.FilterStatus == "Completed")">Completed</option>
+                <option value="Cancelled" selected="@(Model.FilterStatus == "Cancelled")">Cancelled</option>
+            </select>
+        </div>
+        <div>
+            <a href="/Teacher/SpecialSessions" class="block w-full text-center bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                Clear Filters
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Sessions List -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div class="p-6">
+        @if (Model.SpecialSessions.Any())
+        {
+            <div class="space-y-4">
+                @foreach (var session in Model.SpecialSessions)
+                {
+                    var typeColor = session.LectureType switch
+                    {
+                        "Quiz" => "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20",
+                        "Test" => "border-red-500 bg-red-50 dark:bg-red-900/20",
+                        "Lab" or "Practical" => "border-purple-500 bg-purple-50 dark:bg-purple-900/20",
+                        "Workshop" => "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20",
+                        "GuestLecture" => "border-pink-500 bg-pink-50 dark:bg-pink-900/20",
+                        "Review" => "border-blue-500 bg-blue-50 dark:bg-blue-900/20",
+                        "MakeUp" => "border-orange-500 bg-orange-50 dark:bg-orange-900/20",
+                        _ => "border-green-500 bg-green-50 dark:bg-green-900/20"
+                    };
+
+                    var statusBadge = session.Status switch
+                    {
+                        "Completed" => "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+                        "Cancelled" => "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+                        _ => "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    };
+
+                    var typeIcon = session.LectureType switch
+                    {
+                        "Quiz" => "🎯",
+                        "Test" => "📝",
+                        "Lab" or "Practical" => "🧪",
+                        "Workshop" => "🛠️",
+                        "GuestLecture" => "👨‍🏫",
+                        "Review" => "📚",
+                        "MakeUp" => "🔄",
+                        "Extra" => "➕",
+                        _ => "⚡"
+                    };
+
+                    <div class="border-l-4 @typeColor rounded-r-lg p-4 hover:shadow-md transition">
+                        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-3xl">@typeIcon</span>
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 flex-wrap mb-2">
+                                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">@session.LectureType</h3>
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium @statusBadge">
+                                                @session.Status
+                                            </span>
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300 font-semibold">@session.CourseName (@session.CourseCode)</p>
+                                        <div class="flex flex-wrap gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                            <span><strong>Section:</strong> @session.BadgeName - @session.SectionName</span>
+                                            <span><strong>Date:</strong> @session.StartDateTime.ToString("MMM dd, yyyy")</span>
+                                            <span><strong>Time:</strong> @session.StartDateTime.ToString("hh:mm tt") - @session.EndDateTime.ToString("hh:mm tt")</span>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(session.Description))
+                                        {
+                                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 italic">@session.Description</p>
+                                        }
+                                        @if (session.AttendanceMarked)
+                                        {
+                                            <div class="mt-2 inline-flex items-center gap-2 text-sm">
+                                                <span class="text-green-600 dark:text-green-400 font-semibold">
+                                                    ✓ Attendance: @session.PresentCount / @session.TotalStudents students present
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 flex-shrink-0">
+                                @if (session.StartDateTime > DateTime.Now && !session.AttendanceMarked)
+                                {
+                                    <a href="/Teacher/Attendance/Mark?lectureId=@session.Id" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition text-sm font-semibold flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Mark
+                                    </a>
+                                }
+                                @if (session.CanEdit)
+                                {
+                                    <a href="/Teacher/SpecialSessions/Edit?id=@session.Id" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition text-sm font-semibold flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                        Edit
+                                    </a>
+                                }
+                                @if (session.CanDelete)
+                                {
+                                    <a href="/Teacher/SpecialSessions/Delete?id=@session.Id" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition text-sm font-semibold flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Delete
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-12">
+                <span class="text-6xl">⚡</span>
+                <p class="text-gray-600 dark:text-gray-400 text-lg mt-4 font-semibold">No Special Sessions Found</p>
+                <p class="text-gray-500 dark:text-gray-500 mt-2">Create your first special session for quizzes, tests, or extra classes</p>
+                <a href="/Teacher/SpecialSessions/Create" class="inline-block mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition">
+                    Create Special Session
+                </a>
+            </div>
+        }
+    </div>
+</div>

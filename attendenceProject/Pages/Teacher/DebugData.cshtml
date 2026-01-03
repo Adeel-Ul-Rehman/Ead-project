@@ -1,0 +1,66 @@
+@page
+@model attendenceProject.Pages.Teacher.DebugDataModel
+@{
+    ViewData["Title"] = "Debug Data";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Debug Data</h1>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-semibold mb-4">Teacher Courses</h2>
+        <p class="mb-2"><strong>Total Teacher Courses:</strong> @Model.TeacherCourses.Count</p>
+        
+        @foreach (var tc in Model.TeacherCourses)
+        {
+            <div class="border p-4 mb-4 rounded">
+                <h3 class="text-xl font-semibold">@tc.Course.Title - @tc.Section.Name</h3>
+                <p><strong>Total Lectures:</strong> @tc.Lectures.Count</p>
+                <p><strong>Lectures with Attendance:</strong> @tc.Lectures.Count(l => l.AttendanceRecords.Any())</p>
+                <p><strong>Total Students in Section:</strong> @tc.TotalStudents</p>
+                
+                @if (tc.Lectures.Any(l => l.AttendanceRecords.Any()))
+                {
+                    <div class="mt-4">
+                        <h4 class="font-semibold">Lectures with Attendance Records:</h4>
+                        <ul class="list-disc list-inside">
+                            @foreach (var lecture in tc.Lectures.Where(l => l.AttendanceRecords.Any()))
+                            {
+                                <li>
+                                    Lecture ID: @lecture.Id, 
+                                    Date: @lecture.StartDateTime.ToString("yyyy-MM-dd HH:mm"), 
+                                    Attendance Records: @lecture.AttendanceRecords.Count
+                                    <ul class="list-circle list-inside ml-6">
+                                        @{
+                                            var present = lecture.AttendanceRecords.Count(a => a.Status == "Present");
+                                            var absent = lecture.AttendanceRecords.Count(a => a.Status == "Absent");
+                                            var late = lecture.AttendanceRecords.Count(a => a.Status == "Late");
+                                            var excused = lecture.AttendanceRecords.Count(a => a.Status == "Excused");
+                                        }
+                                        <li>Present: @present</li>
+                                        <li>Absent: @absent</li>
+                                        <li>Late: @late</li>
+                                        <li>Excused: @excused</li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-red-600 mt-2">❌ No attendance records found for this course!</p>
+                }
+            </div>
+        }
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">What This Tells Us</h2>
+        <ul class="list-disc list-inside space-y-2">
+            <li>If "Lectures with Attendance" is 0, the attendance marking didn't save properly</li>
+            <li>If "Total Students in Section" is 0, there are no students in the section</li>
+            <li>If lectures exist but no attendance records, you need to mark attendance for them</li>
+        </ul>
+    </div>
+</div>

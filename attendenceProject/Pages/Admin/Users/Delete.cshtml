@@ -1,0 +1,174 @@
+@page
+@model attendenceProject.Pages.Admin.Users.DeleteModel
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<!-- Header Section -->
+<div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2 sm:gap-3">
+        <span class="text-3xl sm:text-4xl md:text-5xl">⚠️</span>
+        <span>Delete User</span>
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2 text-base sm:text-lg">Are you sure you want to delete this user?</p>
+</div>
+
+<!-- Warning Card -->
+<div class="bg-red-50 dark:bg-red-900 border-l-4 border-red-500 p-4 sm:p-6 rounded-lg shadow-lg mb-6 max-w-3xl">
+    <div class="flex items-start">
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-red-500 mr-3 sm:mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <div>
+            <h3 class="text-base sm:text-lg font-bold text-red-800 dark:text-red-200 mb-2">Warning: This action cannot be undone!</h3>
+            <p class="text-red-700 dark:text-red-300 text-sm">
+                Deleting this user will permanently remove their account from the system.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Card -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 md:p-8 max-w-3xl">
+    <div class="space-y-6">
+        <div class="border-l-4 border-indigo-500 pl-4">
+            <h3 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4">User Details</h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Full Name</p>
+                    <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.User.FullName</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                    <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.User.Email</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Role</p>
+                    @if (Model.User.Role == "Admin")
+                    {
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                            Admin
+                        </span>
+                    }
+                    else if (Model.User.Role == "Teacher")
+                    {
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                            Teacher
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                            Student
+                        </span>
+                    }
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Created</p>
+                    <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.User.CreatedAt.ToString("MMM dd, yyyy")</p>
+                </div>
+            </div>
+
+            <!-- Role-specific information -->
+            @if (Model.User.Role == "Teacher" && Model.User.Teacher != null)
+            {
+                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 mb-4">
+                    <h4 class="text-sm font-bold text-purple-800 dark:text-purple-200 mb-2">Teacher Information</h4>
+                    <div class="space-y-2">
+                        <div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Designation:</span>
+                            <span class="text-sm font-semibold text-gray-800 dark:text-white ml-2">
+                                @(string.IsNullOrEmpty(Model.User.Teacher.Designation) ? "Not specified" : Model.User.Teacher.Designation)
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Course Assignments:</span>
+                            <span class="text-sm font-semibold text-gray-800 dark:text-white ml-2">@Model.TeacherCourseCount</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model.User.Role == "Student" && Model.User.Student != null)
+            {
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-4">
+                    <h4 class="text-sm font-bold text-green-800 dark:text-green-200 mb-2">Student Information</h4>
+                    <div class="space-y-2">
+                        <div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Roll Number:</span>
+                            <span class="text-sm font-semibold text-gray-800 dark:text-white ml-2">@Model.User.Student.RollNo</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.User.Student.FatherName))
+                        {
+                            <div>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">Father's Name:</span>
+                                <span class="text-sm font-semibold text-gray-800 dark:text-white ml-2">@Model.User.Student.FatherName</span>
+                            </div>
+                        }
+                        <div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Attendance Records:</span>
+                            <span class="text-sm font-semibold text-gray-800 dark:text-white ml-2">@Model.AttendanceRecordCount</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.CannotDelete)
+        {
+            <div class="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-yellow-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <div>
+                        <h4 class="text-sm font-bold text-yellow-800 dark:text-yellow-200 mb-1">Cannot Delete!</h4>
+                        <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                            @if (Model.User.Role == "Teacher" && Model.TeacherCourseCount > 0)
+                            {
+                                <span>This teacher has <strong>@Model.TeacherCourseCount course assignment(s)</strong>. Please remove all assignments before deleting this user.</span>
+                            }
+                            else if (Model.User.Role == "Student" && Model.AttendanceRecordCount > 0)
+                            {
+                                <span>This student has <strong>@Model.AttendanceRecordCount attendance record(s)</strong>. Users with attendance history cannot be deleted to maintain data integrity.</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Action Buttons -->
+        <form method="post" class="pt-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="User.Id" />
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                @if (!Model.CannotDelete)
+                {
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Confirm Delete
+                    </button>
+                }
+                else
+                {
+                    <button type="button" disabled class="flex-1 bg-gray-400 cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                        </svg>
+                        Cannot Delete
+                    </button>
+                }
+                <a href="/Admin/Users" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to List
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

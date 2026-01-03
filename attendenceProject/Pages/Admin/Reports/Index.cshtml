@@ -1,0 +1,268 @@
+@page
+@model attendenceProject.Pages.Admin.Reports.IndexModel
+@{
+    ViewData["Title"] = "Reports";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Modern Header with Gradient -->
+    <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl shadow-2xl p-8 mb-8 text-white">
+        <h1 class="text-4xl font-bold mb-2">📊 Reports & Analytics Dashboard</h1>
+        <p class="text-lg opacity-90">Comprehensive insights and data exports for attendance management</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Students Card -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-90 mb-1">Total Students</p>
+                    <p class="text-4xl font-bold">@Model.TotalStudents</p>
+                </div>
+                <div class="text-5xl opacity-80">👨‍🎓</div>
+            </div>
+        </div>
+
+        <!-- Total Teachers Card -->
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-90 mb-1">Total Teachers</p>
+                    <p class="text-4xl font-bold">@Model.TotalTeachers</p>
+                </div>
+                <div class="text-5xl opacity-80">👨‍🏫</div>
+            </div>
+        </div>
+
+        <!-- Total Courses Card -->
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-90 mb-1">Total Courses</p>
+                    <p class="text-4xl font-bold">@Model.TotalCourses</p>
+                </div>
+                <div class="text-5xl opacity-80">📚</div>
+            </div>
+        </div>
+
+        <!-- Attendance Rate Card -->
+        <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-90 mb-1">Attendance Rate</p>
+                    <p class="text-4xl font-bold">@Model.OverallAttendanceRate%</p>
+                </div>
+                <div class="text-5xl opacity-80">📈</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Categories -->
+    @{
+        var categories = Model.AvailableReports.GroupBy(r => r.Category).OrderBy(g => g.Key);
+    }
+
+    @foreach (var category in categories)
+    {
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg shadow-md">
+                    @category.Key
+                </span>
+                <span class="ml-3 text-gray-400 text-sm">(@category.Count() reports)</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var report in category)
+                {
+                    <div class="group relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-l-4 @GetBorderColor(report.Category)">
+                        <div class="p-6">
+                            <!-- Icon and Badge -->
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="text-5xl transform group-hover:scale-110 transition-transform duration-300">
+                                    @report.Icon
+                                </div>
+                                <span class="@GetBadgeColor(report.Category) text-xs px-3 py-1 rounded-full font-semibold">
+                                    @report.Category.Replace(" Reports", "")
+                                </span>
+                            </div>
+
+                            <!-- Report Details -->
+                            <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                                @report.Name
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                @report.Description
+                            </p>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2">
+                                <a href="@report.PageUrl" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-medium text-center transition-all duration-300 transform hover:scale-105 shadow-md">
+                                    View Report
+                                </a>
+                                <div class="relative export-dropdown">
+                                    <button type="button" 
+                                            class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-md"
+                                            onclick="toggleExportMenu('@report.Id')">
+                                        Export ⬇️
+                                    </button>
+                                    <div id="export-menu-@report.Id" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50 border border-gray-200">
+                                        <form method="post" asp-page-handler="ExportReport" class="p-2">
+                                            <input type="hidden" name="reportType" value="@report.Id" />
+                                            <button type="submit" name="format" value="excel" class="w-full text-left px-4 py-2 hover:bg-green-50 rounded-lg flex items-center gap-2 text-gray-700 transition-colors">
+                                                <span class="text-xl">📊</span>
+                                                <span>Export as Excel</span>
+                                            </button>
+                                            <button type="submit" name="format" value="pdf" class="w-full text-left px-4 py-2 hover:bg-red-50 rounded-lg flex items-center gap-2 text-gray-700 transition-colors">
+                                                <span class="text-xl">📄</span>
+                                                <span>Export as PDF</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hover Effect Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-r @GetGradientColor(report.Category) opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Enhanced Quick Stats Section -->
+    <div class="mt-10 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl shadow-2xl p-8 text-white">
+        <h2 class="text-3xl font-bold mb-6 flex items-center">
+            <span>📈 System Overview</span>
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <div class="bg-white bg-opacity-20 backdrop-blur rounded-xl p-5 transform hover:scale-105 transition-all duration-300">
+                <div class="text-4xl font-bold mb-1">@Model.TotalStudents</div>
+                <div class="text-sm opacity-90">Students</div>
+            </div>
+            <div class="bg-white bg-opacity-20 backdrop-blur rounded-xl p-5 transform hover:scale-105 transition-all duration-300">
+                <div class="text-4xl font-bold mb-1">@Model.TotalTeachers</div>
+                <div class="text-sm opacity-90">Teachers</div>
+            </div>
+            <div class="bg-white bg-opacity-20 backdrop-blur rounded-xl p-5 transform hover:scale-105 transition-all duration-300">
+                <div class="text-4xl font-bold mb-1">@Model.TotalCourses</div>
+                <div class="text-sm opacity-90">Courses</div>
+            </div>
+            <div class="bg-white bg-opacity-20 backdrop-blur rounded-xl p-5 transform hover:scale-105 transition-all duration-300">
+                <div class="text-4xl font-bold mb-1">@Model.TotalSections</div>
+                <div class="text-sm opacity-90">Sections</div>
+            </div>
+            <div class="bg-white bg-opacity-20 backdrop-blur rounded-xl p-5 transform hover:scale-105 transition-all duration-300">
+                <div class="text-4xl font-bold mb-1">@Model.TotalReports</div>
+                <div class="text-sm opacity-90">Reports Available</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity / Insights Section -->
+    <div class="mt-8 bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span>💡</span>
+            <span>Quick Insights</span>
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <p class="text-sm text-gray-600 mb-1">Overall Attendance</p>
+                <p class="text-2xl font-bold text-blue-600">@Model.OverallAttendanceRate%</p>
+                <p class="text-xs text-gray-500 mt-1">
+                    @(Model.OverallAttendanceRate >= 75 ? "✅ Meeting target" : "⚠️ Below target")
+                </p>
+            </div>
+            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                <p class="text-sm text-gray-600 mb-1">Active Entities</p>
+                <p class="text-2xl font-bold text-green-600">@(Model.TotalStudents + Model.TotalTeachers)</p>
+                <p class="text-xs text-gray-500 mt-1">Total active users</p>
+            </div>
+            <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                <p class="text-sm text-gray-600 mb-1">Report Types</p>
+                <p class="text-2xl font-bold text-purple-600">@Model.TotalReports</p>
+                <p class="text-xs text-gray-500 mt-1">Available for export</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetBorderColor(string category)
+    {
+        return category switch
+        {
+            "Student Reports" => "border-blue-500",
+            "Teacher Reports" => "border-purple-500",
+            "Course Reports" => "border-green-500",
+            "Trend Reports" => "border-orange-500",
+            _ => "border-gray-500"
+        };
+    }
+
+    private string GetBadgeColor(string category)
+    {
+        return category switch
+        {
+            "Student Reports" => "bg-blue-100 text-blue-800",
+            "Teacher Reports" => "bg-purple-100 text-purple-800",
+            "Course Reports" => "bg-green-100 text-green-800",
+            "Trend Reports" => "bg-orange-100 text-orange-800",
+            _ => "bg-gray-100 text-gray-800"
+        };
+    }
+
+    private string GetGradientColor(string category)
+    {
+        return category switch
+        {
+            "Student Reports" => "from-blue-500 to-blue-600",
+            "Teacher Reports" => "from-purple-500 to-purple-600",
+            "Course Reports" => "from-green-500 to-green-600",
+            "Trend Reports" => "from-orange-500 to-orange-600",
+            _ => "from-gray-500 to-gray-600"
+        };
+    }
+}
+
+<script>
+    // Toggle export dropdown menu
+    function toggleExportMenu(reportId) {
+        const menu = document.getElementById(`export-menu-${reportId}`);
+        // Close all other menus
+        document.querySelectorAll('[id^="export-menu-"]').forEach(m => {
+            if (m !== menu) m.classList.add('hidden');
+        });
+        menu.classList.toggle('hidden');
+    }
+
+    // Close export menus when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.export-dropdown')) {
+            document.querySelectorAll('[id^="export-menu-"]').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+        }
+    });
+</script>
+
+<style>
+    /* Smooth animations */
+    .export-dropdown button {
+        transition: all 0.3s ease;
+    }
+
+    .export-dropdown button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Gradient text animation */
+    @@keyframes gradient-shift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+</style>

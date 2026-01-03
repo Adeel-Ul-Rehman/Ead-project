@@ -1,0 +1,415 @@
+@model attendenceProject.Pages.Admin.Teachers.IndexModel
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Side: Assignment Form -->
+    <div class="lg:col-span-1">
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 rounded-lg p-6 sticky top-6">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Assign Courses
+            </h3>
+
+            <form method="post" asp-page-handler="AssignCourses" class="space-y-4" id="assignCourseForm">
+                @Html.AntiForgeryToken()
+
+                <!-- Select Teacher -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Select Teacher <span class="text-red-500">*</span>
+                    </label>
+                    <select asp-for="SelectedTeacherId" asp-items="Model.TeacherOptions"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                            required>
+                        <option value="">Choose teacher...</option>
+                    </select>
+                </div>
+
+                <!-- Select Course -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Select Course <span class="text-red-500">*</span>
+                    </label>
+                    <select asp-for="SelectedCourseId" asp-items="Model.CourseOptions"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                            required>
+                        <option value="">Choose course...</option>
+                    </select>
+                </div>
+
+                <!-- Cascading Section Filters -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Filter Sections
+                    </h4>
+
+                    <!-- Select Badge -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            Program/Badge <span class="text-red-500">*</span>
+                        </label>
+                        <select id="badgeFilter" asp-items="Model.BadgeOptions"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                onchange="filterSections()" required>
+                            <option value="">Choose badge...</option>
+                        </select>
+                    </div>
+
+                    <!-- Select Semester -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            Semester <span class="text-red-500">*</span>
+                        </label>
+                        <select id="semesterFilter"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                onchange="filterSections()" required disabled>
+                            <option value="">Select badge first...</option>
+                        </select>
+                    </div>
+
+                    <!-- Select Session -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            Session <span class="text-red-500">*</span>
+                        </label>
+                        <select id="sessionFilter"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                onchange="filterSections()" required disabled>
+                            <option value="">Select semester first...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Select Sections (Multiple) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Select Sections <span class="text-red-500">*</span>
+                    </label>
+                    <div id="sectionsContainer" class="border border-gray-300 dark:border-gray-600 rounded-lg p-3 max-h-48 overflow-y-auto bg-white dark:bg-gray-700">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">Please select badge, semester, and session first</p>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Select multiple sections to assign at once</p>
+                </div>
+
+                <!-- Info Box -->
+                <div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-3 rounded text-xs">
+                    <p class="text-blue-800 dark:text-blue-200">
+                        <strong>Note:</strong> You can assign the same course to multiple sections at once. Duplicates will be automatically skipped.
+                    </p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Assign Course
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Side: Current Assignments -->
+    <div class="lg:col-span-2">
+        <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-lg">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Current Assignments
+                </h3>
+                <span id="assignmentCount" class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-sm font-semibold">@Model.Assignments.Count</span>
+            </div>
+
+            <!-- Advanced Filters -->
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Filter Assignments
+                    </h4>
+                    <button type="button" onclick="clearAssignmentFilters()" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium">
+                        Clear All
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Search -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Search</label>
+                        <input type="text" id="assignmentSearchInput"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                               placeholder="Teacher or course...">
+                    </div>
+
+                    <!-- Badge Filter -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Badge</label>
+                        <select id="assignmentBadgeFilter"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                onchange="filterAssignments()">
+                            <option value="">All badges</option>
+                            @foreach (var badge in Model.BadgeOptions)
+                            {
+                                <option value="@badge.Text">@badge.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Semester Filter -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Semester</label>
+                        <select id="assignmentSemesterFilter"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                onchange="filterAssignments()">
+                            <option value="">All semesters</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                    </div>
+
+                    <!-- Session Filter -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Session</label>
+                        <select id="assignmentSessionFilter"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                onchange="filterAssignments()">
+                            <option value="">All sessions</option>
+                            @foreach (var assignment in Model.Assignments.Select(a => a.Section?.Session).Distinct().Where(s => !string.IsNullOrEmpty(s)).OrderByDescending(s => s))
+                            {
+                                <option value="@assignment">@assignment</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignments List -->
+            @if (Model.Assignments.Any())
+            {
+                <div id="assignmentsList" class="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                    @foreach (var assignment in Model.Assignments)
+                    {
+                        <div class="assignment-card bg-gray-50 dark:bg-gray-600 rounded-lg p-4 border border-gray-200 dark:border-gray-500 hover:shadow-md transition duration-200"
+                             data-teacher="@assignment.Teacher.User.FullName.ToLower()"
+                             data-course="@assignment.Course.Code.ToLower() @assignment.Course.Title.ToLower()"
+                             data-section="@(assignment.Section?.Name?.ToLower() ?? "")"
+                             data-badge="@(assignment.Section?.Badge?.Name?.ToLower() ?? "")"
+                             data-semester="@(assignment.Section?.Semester.ToString() ?? "")"
+                             data-session="@(assignment.Section?.Session?.ToLower() ?? "")">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="bg-purple-100 dark:bg-purple-900 rounded-full p-2">
+                                            <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800 dark:text-white">@assignment.Teacher.User.FullName</h4>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400">@assignment.Teacher.Designation</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-2 mt-3">
+                                        <div class="bg-white dark:bg-gray-700 rounded p-2">
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Course</p>
+                                            <p class="text-sm font-medium text-gray-800 dark:text-white">@assignment.Course.Code</p>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">@assignment.Course.Title</p>
+                                        </div>
+                                        <div class="bg-white dark:bg-gray-700 rounded p-2">
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Section</p>
+                                            <p class="text-sm font-medium text-gray-800 dark:text-white">@(assignment.Section?.Badge?.Name ?? "N/A") - @(assignment.Section?.Name ?? "N/A")</p>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400">@(assignment.Section?.Session ?? "N/A")</p>
+                                        </div>
+                                    </div>
+
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                        Assigned: @assignment.AssignedAt.ToString("MMM dd, yyyy")
+                                    </p>
+                                </div>
+
+                                <form method="post" asp-page-handler="DeleteAssignment" asp-route-id="@assignment.Id" 
+                                      onsubmit="showDeleteAssignmentModal(event); return false;" class="ml-4">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900 rounded transition duration-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Results Counter -->
+                <div class="mt-4 flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Showing <span id="visibleAssignments" class="font-semibold text-indigo-600 dark:text-indigo-400">@Model.Assignments.Count</span> of <span class="font-semibold">@Model.Assignments.Count</span> assignments
+                    </p>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                        <span id="filterStatus"></span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No assignments yet</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by assigning courses to teachers.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<!-- Enhanced Assignment Filtering and Cascading Section Selection -->
+<script>
+    // Section data from backend
+    const allSectionsData = @Html.Raw(Json.Serialize(Model.AllSectionsForFiltering));
+
+    // Cascading Section Filters for Assignment Form
+    function filterSections() {
+        const badgeId = document.getElementById('badgeFilter').value;
+        const semester = document.getElementById('semesterFilter').value;
+        const session = document.getElementById('sessionFilter').value;
+        const semesterSelect = document.getElementById('semesterFilter');
+        const sessionSelect = document.getElementById('sessionFilter');
+        const sectionsContainer = document.getElementById('sectionsContainer');
+
+        // Enable/disable cascading filters
+        if (!badgeId) {
+            semesterSelect.disabled = true;
+            semesterSelect.innerHTML = '<option value="">Select badge first...</option>';
+            sessionSelect.disabled = true;
+            sessionSelect.innerHTML = '<option value="">Select semester first...</option>';
+            sectionsContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">Please select badge, semester, and session first</p>';
+            return;
+        }
+
+        // Filter sections by badge
+        const badgeSections = allSectionsData.filter(s => s.badgeId.toString() === badgeId);
+        
+        // Enable semester filter
+        semesterSelect.disabled = false;
+        if (!semester) {
+            const semesters = [...new Set(badgeSections.map(s => s.semester))].sort((a, b) => a - b);
+            semesterSelect.innerHTML = '<option value="">Choose semester...</option>' + 
+                semesters.map(sem => `<option value="${sem}">Semester ${sem}</option>`).join('');
+            sessionSelect.disabled = true;
+            sessionSelect.innerHTML = '<option value="">Select semester first...</option>';
+            sectionsContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">Please select semester and session</p>';
+            return;
+        }
+
+        // Filter by semester
+        const semesterSections = badgeSections.filter(s => s.semester.toString() === semester);
+        
+        // Enable session filter
+        sessionSelect.disabled = false;
+        if (!session) {
+            const sessions = [...new Set(semesterSections.map(s => s.session))].sort().reverse();
+            sessionSelect.innerHTML = '<option value="">Choose session...</option>' + 
+                sessions.map(sess => `<option value="${sess}">${sess}</option>`).join('');
+            sectionsContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">Please select session</p>';
+            return;
+        }
+
+        // Filter final sections
+        const finalSections = semesterSections.filter(s => s.session === session);
+        
+        if (finalSections.length === 0) {
+            sectionsContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">No sections found for this combination</p>';
+            return;
+        }
+
+        // Display sections as checkboxes
+        sectionsContainer.innerHTML = finalSections.map(section => `
+            <label class="flex items-center py-1.5 hover:bg-gray-50 dark:hover:bg-gray-600 px-2 rounded cursor-pointer">
+                <input type="checkbox" name="SelectedSectionIds" value="${section.id}" 
+                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Section ${section.name}</span>
+            </label>
+        `).join('');
+    }
+
+    // Enhanced Assignment Filtering
+    function filterAssignments() {
+        const searchTerm = document.getElementById('assignmentSearchInput')?.value.toLowerCase().trim() || '';
+        const badgeFilter = document.getElementById('assignmentBadgeFilter')?.value.toLowerCase() || '';
+        const semesterFilter = document.getElementById('assignmentSemesterFilter')?.value || '';
+        const sessionFilter = document.getElementById('assignmentSessionFilter')?.value.toLowerCase() || '';
+        
+        const assignmentCards = document.querySelectorAll('.assignment-card');
+        let visibleCount = 0;
+
+        assignmentCards.forEach(card => {
+            const teacher = card.getAttribute('data-teacher') || '';
+            const course = card.getAttribute('data-course') || '';
+            const section = card.getAttribute('data-section') || '';
+            const badge = card.getAttribute('data-badge') || '';
+            const semester = card.getAttribute('data-semester') || '';
+            const session = card.getAttribute('data-session') || '';
+
+            const matchesSearch = searchTerm === '' || teacher.includes(searchTerm) || course.includes(searchTerm) || section.includes(searchTerm);
+            const matchesBadge = badgeFilter === '' || badge.includes(badgeFilter);
+            const matchesSemester = semesterFilter === '' || semester === semesterFilter;
+            const matchesSession = sessionFilter === '' || session.includes(sessionFilter);
+
+            const matches = matchesSearch && matchesBadge && matchesSemester && matchesSession;
+
+            card.style.display = matches ? '' : 'none';
+            if (matches) visibleCount++;
+        });
+
+        // Update counter
+        document.getElementById('visibleAssignments').textContent = visibleCount;
+        
+        // Update filter status
+        const activeFilters = [];
+        if (searchTerm) activeFilters.push('Search');
+        if (badgeFilter) activeFilters.push('Badge');
+        if (semesterFilter) activeFilters.push('Semester');
+        if (sessionFilter) activeFilters.push('Session');
+        
+        const filterStatus = document.getElementById('filterStatus');
+        if (activeFilters.length > 0) {
+            filterStatus.textContent = `Active filters: ${activeFilters.join(', ')}`;
+        } else {
+            filterStatus.textContent = '';
+        }
+    }
+
+    function clearAssignmentFilters() {
+        document.getElementById('assignmentSearchInput').value = '';
+        document.getElementById('assignmentBadgeFilter').value = '';
+        document.getElementById('assignmentSemesterFilter').value = '';
+        document.getElementById('assignmentSessionFilter').value = '';
+        filterAssignments();
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Attach search input event listener
+        const searchInput = document.getElementById('assignmentSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterAssignments);
+        }
+    });
+</script>

@@ -1,0 +1,376 @@
+@page
+@model attendenceProject.Pages.Admin.Users.ImportStudentsModel
+@{
+    ViewData["Title"] = "Import Students";
+}
+
+<div class="container mx-auto px-4 py-6">
+    <!-- Page Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">📥 Import Students</h1>
+        <p class="text-gray-600 dark:text-gray-400">Select the section first, then upload CSV or Excel file with student details</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="mb-8">
+        <div class="flex items-center justify-center space-x-4">
+            <div class="flex items-center @(Model.Step >= 1 ? "text-blue-600" : "text-gray-400")">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full @(Model.Step >= 1 ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600") font-bold">
+                    1
+                </div>
+                <span class="ml-2 font-medium hidden sm:inline">Choose Section</span>
+            </div>
+            <div class="h-1 w-16 @(Model.Step >= 2 ? "bg-blue-600" : "bg-gray-300")"></div>
+            <div class="flex items-center @(Model.Step >= 2 ? "text-blue-600" : "text-gray-400")">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full @(Model.Step >= 2 ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600") font-bold">
+                    2
+                </div>
+                <span class="ml-2 font-medium hidden sm:inline">Review Data</span>
+            </div>
+            <div class="h-1 w-16 @(Model.Step >= 3 ? "bg-blue-600" : "bg-gray-300")"></div>
+            <div class="flex items-center @(Model.Step >= 3 ? "text-green-600" : "text-gray-400")">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full @(Model.Step >= 3 ? "bg-green-600 text-white" : "bg-gray-300 text-gray-600") font-bold">
+                    3
+                </div>
+                <span class="ml-2 font-medium hidden sm:inline">Complete</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <p class="text-red-700 dark:text-red-300 font-medium">@Model.ErrorMessage</p>
+            </div>
+        </div>
+    }
+
+    @if (Model.Step == 1)
+    {
+        <!-- STEP 1: Section Selection & File Upload -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                📋 Step 1: Choose Section & Upload File
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                First select which section you want to add students to, then upload your file.
+            </p>
+
+            <form method="post" asp-page-handler="Upload" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <!-- Semester Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        1️⃣ Select Semester <span class="text-red-500">*</span>
+                    </label>
+                    <select id="semesterSelect" asp-for="SelectedSemester" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="loadSections()">
+                        @foreach (var option in Model.SemesterOptions)
+                        {
+                            if (option.Disabled)
+                            {
+                                <option value="@option.Value" disabled selected>@option.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@option.Value">@option.Text</option>
+                            }
+                        }
+                    </select>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Choose which semester you want to add students to
+                    </p>
+                </div>
+
+                <!-- Section Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        2️⃣ Select Section <span class="text-red-500">*</span>
+                    </label>
+                    <select id="sectionSelect" asp-for="SelectedSectionId" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" disabled>
+                        <option value="">-- Select semester first --</option>
+                    </select>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Choose the specific section within the selected semester
+                    </p>
+                </div>
+
+                <!-- File Upload -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        3️⃣ Upload Student List File <span class="text-red-500">*</span>
+                    </label>
+                    <input type="file" name="file" accept=".csv,.xlsx" required
+                           class="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer">
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        📄 Accepted formats: CSV (.csv) or Excel (.xlsx)
+                    </p>
+                </div>
+
+                <!-- CSV Format Guide -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                    <h3 class="font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        Required CSV/Excel Format
+                    </h3>
+                    <div class="bg-white dark:bg-gray-800 rounded p-3 font-mono text-xs overflow-x-auto">
+                        <div class="text-blue-700 dark:text-blue-300 font-bold mb-1">
+                            FullName,Email,FatherName,RollNumber
+                        </div>
+                        <div class="text-gray-700 dark:text-gray-300">
+                            John Doe,john.doe@example.com,Robert Doe,2023-CS-626<br>
+                            Jane Smith,jane.smith@example.com,Michael Smith,2023-CS-627
+                        </div>
+                    </div>
+                    <ul class="mt-3 text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                        <li>• <strong>FullName:</strong> Student's complete name</li>
+                        <li>• <strong>Email:</strong> Unique email address (credentials will be sent here)</li>
+                        <li>• <strong>FatherName:</strong> Father's complete name</li>
+                        <li>• <strong>RollNumber:</strong> Format YYYY-XX-NNN (e.g., 2023-CS-626, 2024-SE-101)</li>
+                    </ul>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-between items-center">
+                    <a href="/Admin/Users" class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        ← Back to Users
+                    </a>
+                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg transition transform hover:scale-105 flex items-center shadow-lg">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Next: Validate File
+                    </button>
+                </div>
+            </form>
+        </div>
+    }
+    else if (Model.Step == 2)
+    {
+        <!-- STEP 2: Preview & Confirm -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                ✅ Step 2: Review Your Data
+            </h2>
+
+            @if (Model.SelectedSection != null)
+            {
+                <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 rounded">
+                    <p class="text-blue-800 dark:text-blue-200 font-medium">
+                        <strong>📌 Adding students to:</strong> @Model.SelectedSection.Name - 
+                        Semester @Model.SelectedSection.Semester (@Model.SelectedSection.Session)
+                    </p>
+                </div>
+            }
+
+            <!-- Validation Statistics -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Total Records</div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">@Model.ValidationResult?.TotalRecords</div>
+                </div>
+                <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                    <div class="text-sm text-green-600 dark:text-green-400">Valid Records</div>
+                    <div class="text-2xl font-bold text-green-700 dark:text-green-300">@Model.ValidationResult?.ValidCount</div>
+                </div>
+                <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                    <div class="text-sm text-red-600 dark:text-red-400">Invalid Records</div>
+                    <div class="text-2xl font-bold text-red-700 dark:text-red-300">@Model.ValidationResult?.ErrorCount</div>
+                </div>
+            </div>
+
+            @if (Model.ValidationResult?.ValidCount > 0)
+            {
+                <!-- Valid Records -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-green-700 dark:text-green-300 mb-3">
+                        ✅ Valid Records (@Model.ValidationResult.ValidCount)
+                    </h3>
+                    <div class="overflow-x-auto border border-green-200 dark:border-green-800 rounded-lg max-h-96 overflow-y-auto">
+                        <table class="min-w-full divide-y divide-green-200 dark:divide-green-800">
+                            <thead class="bg-green-50 dark:bg-green-900/20 sticky top-0">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-green-700 dark:text-green-300 uppercase">#</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-green-700 dark:text-green-300 uppercase">Full Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-green-700 dark:text-green-300 uppercase">Email</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-green-700 dark:text-green-300 uppercase">Father Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-green-700 dark:text-green-300 uppercase">Roll Number</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @for (int i = 0; i < Model.ValidationResult.ValidRecords.Count; i++)
+                                {
+                                    var record = Model.ValidationResult.ValidRecords[i];
+                                    <tr class="hover:bg-green-50 dark:hover:bg-green-900/10">
+                                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">@(i + 1)</td>
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">@record.FullName</td>
+                                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">@record.Email</td>
+                                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">@record.FatherName</td>
+                                        <td class="px-4 py-3 text-sm font-mono text-gray-600 dark:text-gray-300">@record.RollNumber</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            @if (Model.ValidationResult?.ErrorCount > 0)
+            {
+                <!-- Invalid Records -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-red-700 dark:text-red-300 mb-3">
+                        ❌ Invalid Records (will be skipped)
+                    </h3>
+                    <div class="space-y-3">
+                        @foreach (var error in Model.ValidationResult.Errors)
+                        {
+                            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                                <div class="font-semibold text-red-800 dark:text-red-200 mb-1">
+                                    Row @error.RowNumber
+                                    @if (!string.IsNullOrEmpty(error.FullName) || !string.IsNullOrEmpty(error.Email))
+                                    {
+                                        <span class="font-normal">- @error.FullName - @error.Email</span>
+                                    }
+                                </div>
+                                <ul class="list-disc list-inside text-sm text-red-700 dark:text-red-300 space-y-1">
+                                    @foreach (var msg in error.ErrorMessages)
+                                    {
+                                        <li>@msg</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Action Buttons -->
+            <form method="post" asp-page-handler="Confirm">
+                @Html.AntiForgeryToken()
+                <div class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <a href="/Admin/Users/ImportStudents" class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        ← Start Over
+                    </a>
+                    @if (Model.ValidationResult?.ValidCount > 0)
+                    {
+                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-lg transition transform hover:scale-105 flex items-center shadow-lg">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Confirm & Add @Model.ValidationResult.ValidCount Student(s)
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="text-gray-500 dark:text-gray-400 italic">No valid records to import</div>
+                    }
+                </div>
+            </form>
+        </div>
+    }
+    else if (Model.Step == 3)
+    {
+        <!-- STEP 3: Success -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 mb-4">
+                    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">✅ Students Added Successfully! 🎉</h2>
+                <p class="text-gray-600 dark:text-gray-400">All students have been added and their login credentials sent via email</p>
+            </div>
+
+            <!-- Import Statistics -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div class="text-sm text-blue-600 dark:text-blue-400">Attempted</div>
+                    <div class="text-2xl font-bold text-blue-700 dark:text-blue-300">@Model.CreateResult?.TotalAttempted</div>
+                </div>
+                <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                    <div class="text-sm text-green-600 dark:text-green-400">Created</div>
+                    <div class="text-2xl font-bold text-green-700 dark:text-green-300">@Model.CreateResult?.SuccessCount</div>
+                </div>
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                    <div class="text-sm text-yellow-600 dark:text-yellow-400">Skipped</div>
+                    <div class="text-2xl font-bold text-yellow-700 dark:text-yellow-300">@Model.CreateResult?.SkippedCount</div>
+                </div>
+            </div>
+
+            <!-- Email Statistics -->
+            @if (Model.EmailResult != null)
+            {
+                <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+                    <h3 class="font-semibold text-purple-900 dark:text-purple-300 mb-2">📧 Email Delivery Status</h3>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="text-purple-700 dark:text-purple-300">Sent Successfully:</span>
+                            <span class="font-bold text-purple-900 dark:text-purple-100 ml-2">@Model.EmailResult.SuccessCount</span>
+                        </div>
+                        <div>
+                            <span class="text-purple-700 dark:text-purple-300">Failed:</span>
+                            <span class="font-bold text-purple-900 dark:text-purple-100 ml-2">@Model.EmailResult.FailedCount</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Action Buttons -->
+            <div class="flex justify-center space-x-4">
+                <a href="/Admin/Users/ImportStudents" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg transition transform hover:scale-105 shadow-lg">
+                    ➕ Add More Students
+                </a>
+                <a href="/Admin/Users" class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    View All Users →
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    async function loadSections() {
+        const semesterSelect = document.getElementById('semesterSelect');
+        const sectionSelect = document.getElementById('sectionSelect');
+        const selectedValue = semesterSelect.value;
+        
+        // Clear and disable section dropdown
+        sectionSelect.innerHTML = '<option value="">Loading...</option>';
+        sectionSelect.disabled = true;
+        
+        if (!selectedValue) {
+            sectionSelect.innerHTML = '<option value="">-- Select semester first --</option>';
+            return;
+        }
+        
+        // Parse semester and session from value (format: "semester|session")
+        const [semester, session] = selectedValue.split('|');
+        
+        try {
+            const response = await fetch(`?handler=Sections&semester=${semester}&session=${encodeURIComponent(session)}`);
+            const sections = await response.json();
+            
+            sectionSelect.innerHTML = '<option value="">-- Select section --</option>';
+            sections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section.value;
+                option.textContent = section.text;
+                sectionSelect.appendChild(option);
+            });
+            
+            sectionSelect.disabled = false;
+        } catch (error) {
+            console.error('Error loading sections:', error);
+            sectionSelect.innerHTML = '<option value="">Error loading sections</option>';
+        }
+    }
+</script>

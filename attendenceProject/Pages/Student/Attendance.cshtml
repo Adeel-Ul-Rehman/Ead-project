@@ -1,0 +1,169 @@
+@page
+@model attendenceProject.Pages.Student.AttendanceModel
+@{
+    ViewData["Title"] = "My Attendance";
+}
+
+<!-- Header Section -->
+<div class="mb-6">
+    <div class="bg-gradient-to-r from-green-600 via-teal-600 to-cyan-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold flex items-center gap-3">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                    <span>My Attendance</span>
+                </h1>
+                <p class="text-white text-opacity-90 mt-2">View and track your complete attendance history</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Course</label>
+            <select name="courseId" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500" onchange="this.form.submit()">
+                <option value="">All Courses</option>
+                @foreach (var course in Model.AvailableCourses)
+                {
+                    <option value="@course.CourseId" selected="@(Model.SelectedCourseId == course.CourseId)">@course.CourseName</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+            <select name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500" onchange="this.form.submit()">
+                <option value="">All Status</option>
+                <option value="Present" selected="@(Model.SelectedStatus == "Present")">Present</option>
+                <option value="Absent" selected="@(Model.SelectedStatus == "Absent")">Absent</option>
+                <option value="Late" selected="@(Model.SelectedStatus == "Late")">Late</option>
+                <option value="Excused" selected="@(Model.SelectedStatus == "Excused")">Excused</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">From Date</label>
+            <input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500" onchange="this.form.submit()">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">To Date</label>
+            <input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500" onchange="this.form.submit()">
+        </div>
+    </form>
+</div>
+
+<!-- Stats Summary -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-4 text-white">
+        <p class="text-sm font-medium text-blue-100">Total Lectures</p>
+        <p class="text-3xl font-bold mt-1">@Model.TotalRecords</p>
+    </div>
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-4 text-white">
+        <p class="text-sm font-medium text-green-100">Present</p>
+        <p class="text-3xl font-bold mt-1">@Model.PresentCount</p>
+    </div>
+    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg shadow-lg p-4 text-white">
+        <p class="text-sm font-medium text-red-100">Absent</p>
+        <p class="text-3xl font-bold mt-1">@Model.AbsentCount</p>
+    </div>
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-4 text-white">
+        <p class="text-sm font-medium text-purple-100">Attendance Rate</p>
+        <p class="text-3xl font-bold mt-1">@Model.AttendancePercentage%</p>
+    </div>
+</div>
+
+<!-- Attendance Records Table -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-6 py-4 flex items-center gap-2">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h2 class="text-xl font-bold">Attendance Records</h2>
+        <span class="ml-auto text-sm text-gray-300">@Model.AttendanceRecords.Count records</span>
+    </div>
+    
+    @if (Model.AttendanceRecords.Any())
+    {
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-100 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Course</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Lecture Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Room</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Marked At</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach (var record in Model.AttendanceRecords)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                @record.Lecture.StartDateTime.ToString("MMM dd, yyyy")
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                <div class="font-medium">@record.Lecture.TimetableRule.TeacherCourse.Course.Title</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">@record.Lecture.TimetableRule.TeacherCourse.Course.Code</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full @(record.Lecture.LectureType == "Regular" ? "bg-blue-100 text-blue-800" : "bg-orange-100 text-orange-800")">
+                                    @record.Lecture.LectureType
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                @record.Lecture.StartDateTime.ToString("hh:mm tt")
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                @record.Lecture.TimetableRule.Room
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                @if (record.Status == "Present")
+                                {
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        ✓ Present
+                                    </span>
+                                }
+                                else if (record.Status == "Absent")
+                                {
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                        ✗ Absent
+                                    </span>
+                                }
+                                else if (record.Status == "Late")
+                                {
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                        ⏰ Late
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                        @record.Status
+                                    </span>
+                                }
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                @record.MarkedAt.ToString("MMM dd, hh:mm tt")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="p-12 text-center">
+            <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="text-gray-500 dark:text-gray-400 text-lg">No attendance records found for the selected filters.</p>
+        </div>
+    }
+</div>

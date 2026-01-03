@@ -1,0 +1,57 @@
+﻿@page
+@model attendenceProject.Pages.Admin.TeacherCourses.IndexModel
+@{
+    ViewData["Title"] = "Course Assignments";
+}
+
+<!-- Success/Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900 border-l-4 border-green-500 p-4 mb-6 rounded-lg shadow-md animate-fade-in">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-green-800 dark:text-green-200 font-medium">@TempData["SuccessMessage"]</p>
+            </div>
+        </div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900 dark:to-pink-900 border-l-4 border-red-500 p-4 mb-6 rounded-lg shadow-md animate-fade-in">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-red-800 dark:text-red-200 font-medium">@TempData["ErrorMessage"]</p>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Header Section -->
+<div class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                <span class="text-5xl"></span>
+                <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Course Assignments</span>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">Assign teachers to courses for specific sections</p>
+        </div>
+        <a href="/Admin/TeacherCourses/Create" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            New Assignment
+        </a>
+    </div>
+</div>

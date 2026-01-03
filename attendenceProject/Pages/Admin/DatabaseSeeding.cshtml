@@ -1,0 +1,68 @@
+@page
+@model attendenceProject.Pages.Admin.DatabaseSeedingModel
+@{
+    ViewData["Title"] = "Database Seeding";
+}
+
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-6">🌱 Database Seeding</h1>
+        
+        @if (Model.Message != null)
+        {
+            <div class="mb-4 p-4 rounded @(Model.IsSuccess ? "bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-200" : "bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-200")">
+                @Model.Message
+            </div>
+        }
+
+        @if (Model.IsProcessing)
+        {
+            <div class="text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">Processing... Please wait...</p>
+            </div>
+        }
+        else
+        {
+            <div class="space-y-6">
+                <div class="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-500 p-4">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="font-bold text-yellow-800 dark:text-yellow-200">Warning!</h3>
+                            <p class="text-sm text-yellow-700 dark:text-yellow-300">This will DELETE all existing data except admin account and seed fresh data.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-4">
+                    <h3 class="font-bold text-blue-800 dark:text-blue-200 mb-2">What will be created:</h3>
+                    <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                        <li>✅ 7 Teachers with proper designations</li>
+                        <li>✅ 45 Students (15 in BSCS-5A, 20 in BSCS-5B, 10 in BSCS-7A)</li>
+                        <li>✅ 20 Courses across all semesters</li>
+                        <li>✅ 3 Sections (BSCS-5A, BSCS-5B, BSCS-7A)</li>
+                        <li>✅ Teacher-Course assignments</li>
+                        <li>✅ Timetable distributed Mon-Fri (Friday lighter)</li>
+                        <li>✅ Lectures from Oct 15, 2025 to Jan 20, 2026</li>
+                        <li>✅ Attendance records with ~75% attendance rate</li>
+                        <li>✅ Past lectures: Completed with attendance</li>
+                        <li>✅ Future lectures: Scheduled status</li>
+                    </ul>
+                </div>
+
+                <form method="post" onsubmit="return confirm('Are you absolutely sure? This will delete all existing data!');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Start Database Seeding
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

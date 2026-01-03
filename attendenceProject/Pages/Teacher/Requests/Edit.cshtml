@@ -1,0 +1,138 @@
+@page
+@model attendenceProject.Pages.Teacher.Requests.EditModel
+@{
+    ViewData["Title"] = "Edit Attendance Requests";
+}
+
+<div class="mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+                <span class="text-4xl">✏️</span>
+                <span>Edit Attendance Requests</span>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Request permission to edit already marked attendance</p>
+        </div>
+        <a href="/Teacher/Attendance" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+            ← Back
+        </a>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(TempData["Success"] as string))
+{
+    <div class="mb-6 bg-green-50 dark:bg-green-900 border-l-4 border-green-500 p-4 rounded">
+        <p class="text-green-700 dark:text-green-200">@TempData["Success"]</p>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(TempData["Error"] as string))
+{
+    <div class="mb-6 bg-red-50 dark:bg-red-900 border-l-4 border-red-500 p-4 rounded">
+        <p class="text-red-700 dark:text-red-200">@TempData["Error"]</p>
+    </div>
+}
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+    <div class="bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-6 py-4 rounded-t-lg">
+        <h2 class="text-xl font-bold">Submit Edit Request</h2>
+    </div>
+    <div class="p-6">
+        @if (Model.CompletedLectures.Any())
+        {
+            <form method="post">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Select Lecture <span class="text-red-500">*</span></label>
+                        <select asp-for="LectureId" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 dark:bg-gray-700 dark:text-white" required>
+                            <option value="">-- Choose a lecture --</option>
+                            @foreach (var lecture in Model.CompletedLectures)
+                            {
+                                <option value="@lecture.Id">@lecture.Display</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Reason for Edit <span class="text-red-500">*</span></label>
+                        <textarea asp-for="Reason" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 dark:bg-gray-700 dark:text-white" placeholder="Why do you need to edit this attendance?" required></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
+                        Submit Edit Request
+                    </button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <p class="text-center text-gray-500 dark:text-gray-400 py-8">No completed lectures available for edit requests</p>
+        }
+    </div>
+</div>
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-t-lg">
+        <h2 class="text-xl font-bold">My Edit Requests</h2>
+    </div>
+    <div class="p-6">
+        @if (Model.MyRequests.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Requested</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Lecture</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Course</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Reason</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Admin Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach (var request in Model.MyRequests)
+                        {
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                    @request.RequestedAt.ToString("MMM dd, hh:mm tt")
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                    @request.LectureDate.ToString("MMM dd, hh:mm tt")
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                                    <div class="font-medium">@request.CourseName</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">@request.SectionName</div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                    @request.Reason
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @{
+                                        var statusClass = request.Status switch
+                                        {
+                                            "Pending" => "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+                                            "Approved" => "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+                                            "Rejected" => "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+                                            _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                                        };
+                                    }
+                                    <span class="@statusClass px-3 py-1 rounded-full text-xs font-semibold">@request.Status</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                    @(request.AdminComments ?? "-")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-center text-gray-500 dark:text-gray-400 py-12">No edit requests submitted yet</p>
+        }
+    </div>
+</div>

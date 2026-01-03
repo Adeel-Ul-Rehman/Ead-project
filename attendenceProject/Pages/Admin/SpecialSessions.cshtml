@@ -1,0 +1,570 @@
+@page
+@model attendenceProject.Pages.Admin.SpecialSessionsModel
+@{
+    ViewData["Title"] = "Special Sessions Monitor";
+}
+
+<style>
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+</style>
+
+<!-- Header Section -->
+<div class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                <span class="text-5xl">⚡</span>
+                <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Special Sessions Monitor</span>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">Track and analyze ad-hoc sessions created by teachers</p>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+    <!-- Total Sessions Card -->
+    <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg p-4 sm:p-6 text-white transform hover:scale-105 transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-indigo-100 text-sm mb-1">Total Sessions</p>
+                <p class="text-3xl sm:text-4xl font-bold">@Model.TotalSessions</p>
+            </div>
+            <svg class="w-12 h-12 sm:w-14 sm:h-14 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Scheduled Card -->
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-4 sm:p-6 text-white transform hover:scale-105 transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-purple-100 text-sm mb-1">Scheduled</p>
+                <p class="text-3xl sm:text-4xl font-bold">@Model.ScheduledCount</p>
+            </div>
+            <svg class="w-12 h-12 sm:w-14 sm:h-14 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Completed Card -->
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-4 sm:p-6 text-white transform hover:scale-105 transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-green-100 text-sm mb-1">Completed</p>
+                <p class="text-3xl sm:text-4xl font-bold">@Model.CompletedCount</p>
+            </div>
+            <svg class="w-12 h-12 sm:w-14 sm:h-14 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Students Reached Card -->
+    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-4 sm:p-6 text-white transform hover:scale-105 transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-orange-100 text-sm mb-1">Students Reached</p>
+                <p class="text-3xl sm:text-4xl font-bold">@Model.TotalStudentsReached</p>
+            </div>
+            <svg class="w-12 h-12 sm:w-14 sm:h-14 text-orange-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<!-- Session Type Breakdown -->
+@if (Model.SessionsByType.Any())
+{
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span>📊</span>
+            Session Type Breakdown
+        </h2>
+        <div class="flex flex-wrap gap-3">
+            @foreach (var type in Model.SessionsByType)
+            {
+                var typeEmoji = type.Key switch
+                {
+                    "Quiz" => "🎯",
+                    "Test" => "📝",
+                    "Lab" => "🔬",
+                    "Practical" => "⚙️",
+                    "Workshop" => "🛠️",
+                    "GuestLecture" => "🎤",
+                    "Review" => "📚",
+                    "MakeUp" => "🔄",
+                    "Extra" => "➕",
+                    _ => "📅"
+                };
+                <span class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm">
+                    <span class="text-xl">@typeEmoji</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">@type.Key</span>
+                    <span class="ml-2 px-2 py-0.5 bg-indigo-500 text-white text-xs font-bold rounded-full">@type.Value</span>
+                </span>
+            }
+        </div>
+        @if (Model.CompletedCount > 0)
+        {
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Average Attendance Rate:</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">@Model.AverageAttendanceRate%</span>
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- Search & Filter Section -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+        </svg>
+        Search & Filters
+    </h2>
+    <form method="get" class="space-y-4">
+        <!-- Search Input -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">🔍 Search</label>
+            <input type="text" name="search" value="@Model.SearchTerm" placeholder="Search by teacher or course name..." 
+                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+        </div>
+
+        <!-- Filter Row 1 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Session Type -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Session Type</label>
+                <select name="type" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All Types</option>
+                    <option value="Quiz" selected="@(Model.FilterType == "Quiz")">🎯 Quiz</option>
+                    <option value="Test" selected="@(Model.FilterType == "Test")">📝 Test</option>
+                    <option value="Lab" selected="@(Model.FilterType == "Lab")">🔬 Lab</option>
+                    <option value="Practical" selected="@(Model.FilterType == "Practical")">⚙️ Practical</option>
+                    <option value="Workshop" selected="@(Model.FilterType == "Workshop")">🛠️ Workshop</option>
+                    <option value="GuestLecture" selected="@(Model.FilterType == "GuestLecture")">🎤 Guest Lecture</option>
+                    <option value="Review" selected="@(Model.FilterType == "Review")">📚 Review</option>
+                    <option value="MakeUp" selected="@(Model.FilterType == "MakeUp")">🔄 Make-Up</option>
+                    <option value="Extra" selected="@(Model.FilterType == "Extra")">➕ Extra</option>
+                </select>
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All Status</option>
+                    <option value="Scheduled" selected="@(Model.FilterStatus == "Scheduled")">📅 Scheduled</option>
+                    <option value="Ongoing" selected="@(Model.FilterStatus == "Ongoing")">🟢 Ongoing</option>
+                    <option value="Completed" selected="@(Model.FilterStatus == "Completed")">✅ Completed</option>
+                </select>
+            </div>
+
+            <!-- Teacher -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Teacher</label>
+                <select name="teacher" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All Teachers</option>
+                    @foreach (var teacher in Model.Teachers)
+                    {
+                        <option value="@teacher.Id" selected="@(Model.FilterTeacher == teacher.Id.ToString())">@teacher.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Filter Row 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Badge -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department/Badge</label>
+                <select name="badge" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All Departments</option>
+                    @foreach (var badge in Model.Badges)
+                    {
+                        <option value="@badge.Id" selected="@(Model.FilterBadge == badge.Id)">@badge.Name</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Section -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Section</label>
+                <select name="section" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All Sections</option>
+                    @foreach (var sec in Model.Sections)
+                    {
+                        <option value="@sec.Id" selected="@(Model.FilterSection == sec.Id)">@sec.Name</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Course -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Course</label>
+                <select name="course" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All Courses</option>
+                    @foreach (var course in Model.Courses)
+                    {
+                        <option value="@course.Id" selected="@(Model.FilterCourse == course.Id)">@course.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+            <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <span class="flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Apply Filters
+                </span>
+            </button>
+            <a href="/Admin/SpecialSessions" class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center">
+                <span class="flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Reset
+                </span>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Sessions Table/Cards -->
+@if (!Model.Sessions.Any())
+{
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-12 text-center">
+        <svg class="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Special Sessions Found</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">No special sessions match your current filters.</p>
+        <a href="/Admin/SpecialSessions" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+            Clear All Filters
+        </a>
+    </div>
+}
+else
+{
+    <!-- Modern Sessions Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Course & Section</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Teacher</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Date & Time</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Attendance</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach (var session in Model.Sessions)
+                    {
+                        var attendancePercentage = session.TotalStudents > 0
+                            ? Math.Round((double)(session.PresentCount + session.LateCount) / session.TotalStudents * 100, 1)
+                            : 0;
+                        
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                            <!-- Session Type -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">@session.TypeIcon</span>
+                                    <span class="px-3 py-1 text-sm font-semibold rounded-full @(session.LectureType switch
+                                    {
+                                        "Quiz" => "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+                                        "Test" => "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+                                        "Lab" => "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+                                        "Practical" => "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+                                        "Workshop" => "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+                                        "GuestLecture" => "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+                                        "Review" => "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+                                        "MakeUp" => "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
+                                        "Extra" => "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
+                                        _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                                    })">
+                                        @session.LectureType
+                                    </span>
+                                </div>
+                            </td>
+
+                            <!-- Course & Section -->
+                            <td class="px-6 py-4">
+                                <div class="text-sm">
+                                    <div class="font-semibold text-gray-900 dark:text-white">@session.CourseName</div>
+                                    <div class="text-gray-600 dark:text-gray-400">@session.SectionName</div>
+                                </div>
+                            </td>
+
+                            <!-- Teacher -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                        @session.TeacherName.Substring(0, 1).ToUpper()
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">@session.TeacherName</span>
+                                </div>
+                            </td>
+
+                            <!-- Date & Time -->
+                            <td class="px-6 py-4">
+                                <div class="text-sm">
+                                    <div class="font-semibold text-gray-900 dark:text-white">@session.StartDateTime.ToString("MMM dd, yyyy")</div>
+                                    <div class="text-gray-600 dark:text-gray-400">
+                                        @session.StartDateTime.ToString("hh:mm tt") - @session.EndDateTime.ToString("hh:mm tt")
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        (@((session.EndDateTime - session.StartDateTime).TotalMinutes) mins)
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Attendance -->
+                            <td class="px-6 py-4">
+                                @if (session.StatusText == "Completed")
+                                {
+                                    <div class="text-sm">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="font-semibold text-gray-900 dark:text-white">@(session.PresentCount + session.LateCount)/@session.TotalStudents</span>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">(@attendancePercentage%)</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                            <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all" style="width: @(attendancePercentage)%"></div>
+                                        </div>
+                                    </div>
+                                }
+                                else if (session.StatusText == "Ongoing")
+                                {
+                                    <span class="inline-flex items-center gap-1 text-sm text-green-600 dark:text-green-400 font-medium">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        In Progress
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">Not started</span>
+                                }
+                            </td>
+
+                            <!-- Status -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full @(session.StatusClass switch
+                                {
+                                    "scheduled" => "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+                                    "ongoing" => "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+                                    "completed" => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+                                    _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                                })">
+                                    @session.StatusText
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <button onclick="showSessionDetails(@session.Id)" 
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- Session Details Modal -->
+<div id="sessionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span id="modalIcon">⚡</span>
+                Session Details
+            </h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div id="modalContent" class="p-6"></div>
+    </div>
+</div>
+
+<script>
+    const sessions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Sessions));
+
+    function showSessionDetails(sessionId) {
+        const session = sessions.find(s => s.Id === sessionId);
+        if (!session) return;
+
+        const modal = document.getElementById('sessionModal');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalContent = document.getElementById('modalContent');
+
+        modalIcon.textContent = session.TypeIcon;
+
+        const attendancePercentage = session.TotalStudents > 0
+            ? Math.round((session.PresentCount + session.LateCount) / session.TotalStudents * 100)
+            : 0;
+
+        const statusColors = {
+            'Scheduled': 'bg-blue-100 text-blue-800',
+            'Ongoing': 'bg-green-100 text-green-800',
+            'Completed': 'bg-gray-100 text-gray-800'
+        };
+
+        modalContent.innerHTML = `
+            <div class="space-y-6">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h4 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">${session.LectureType}</h4>
+                        <p class="text-gray-600 dark:text-gray-400">Session #${session.Id}</p>
+                    </div>
+                    <span class="px-3 py-1 text-sm font-semibold rounded-full ${statusColors[session.StatusText]}">${session.StatusText}</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Course</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">${session.CourseName}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Section</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">${session.SectionName}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Teacher</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">${session.TeacherName}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Date</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">${new Date(session.StartDateTime).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Start Time</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">${new Date(session.StartDateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">End Time</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">${new Date(session.EndDateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
+                    </div>
+                </div>
+
+                ${session.Description ? `<div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-4">
+                    <p class="text-sm text-blue-700 dark:text-blue-300 font-medium mb-2">Description</p>
+                    <p class="text-gray-700 dark:text-gray-300">${session.Description}</p>
+                </div>` : ''}
+
+                ${session.StatusText === 'Completed' ? `
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Attendance Summary</h5>
+                    <div class="grid grid-cols-4 gap-4 mb-4">
+                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total</p>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">${session.TotalStudents}</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 dark:bg-green-900 rounded-lg">
+                            <p class="text-sm text-green-600 dark:text-green-400 mb-1">Present</p>
+                            <p class="text-3xl font-bold text-green-700 dark:text-green-300">${session.PresentCount}</p>
+                        </div>
+                        <div class="text-center p-4 bg-red-50 dark:bg-red-900 rounded-lg">
+                            <p class="text-sm text-red-600 dark:text-red-400 mb-1">Absent</p>
+                            <p class="text-3xl font-bold text-red-700 dark:text-red-300">${session.AbsentCount}</p>
+                        </div>
+                        <div class="text-center p-4 bg-yellow-50 dark:bg-yellow-900 rounded-lg">
+                            <p class="text-sm text-yellow-600 dark:text-yellow-400 mb-1">Late</p>
+                            <p class="text-3xl font-bold text-yellow-700 dark:text-yellow-300">${session.LateCount}</p>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900 dark:to-purple-900 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Attendance Rate</span>
+                            <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">${attendancePercentage}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full" style="width: ${attendancePercentage}%"></div>
+                        </div>
+                    </div>
+                </div>
+                ` : session.StatusText === 'Ongoing' ? `
+                <div class="bg-green-50 dark:bg-green-900 rounded-lg p-6 text-center">
+                    <div class="flex items-center justify-center gap-3 text-green-600 dark:text-green-400">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-lg font-semibold">Session Currently in Progress</span>
+                    </div>
+                </div>
+                ` : `
+                <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-6 text-center">
+                    <div class="flex items-center justify-center gap-3 text-blue-600 dark:text-blue-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-lg font-semibold">Scheduled for ${new Date(session.StartDateTime).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</span>
+                    </div>
+                </div>
+                `}
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('sessionModal').classList.add('hidden');
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    document.getElementById('sessionModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+</script>
+
+<!-- Info Box -->
+<div class="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 border-l-4 border-blue-500 p-4 rounded-lg shadow-md">
+    <div class="flex items-start">
+        <svg class="w-6 h-6 text-blue-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+        </svg>
+        <div class="text-blue-800 dark:text-blue-200">
+            <p class="font-semibold mb-1">About Special Sessions</p>
+            <ul class="text-sm space-y-1">
+                <li>• Teachers create special sessions for their assigned courses</li>
+                <li>• Sessions include quizzes, tests, labs, workshops, and other ad-hoc lectures</li>
+                <li>• This is a monitoring view - only teachers can create/edit sessions</li>
+                <li>• Attendance is tracked the same way as regular lectures</li>
+            </ul>
+        </div>
+    </div>
+</div>

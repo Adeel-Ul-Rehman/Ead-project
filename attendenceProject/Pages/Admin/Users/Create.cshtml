@@ -1,0 +1,246 @@
+@page
+@model attendenceProject.Pages.Admin.Users.CreateModel
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<!-- Header Section -->
+<div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2 sm:gap-3">
+        <span class="text-3xl sm:text-4xl md:text-5xl">➕</span>
+        <span>Create New User</span>
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2 text-base sm:text-lg">Add a new user to the system</p>
+</div>
+
+<!-- Info Card -->
+<div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-4 sm:p-6 rounded-lg shadow-md mb-6 max-w-3xl">
+    <div class="flex items-start">
+        <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+            <h4 class="text-sm font-bold text-blue-800 dark:text-blue-200 mb-2">Role Information</h4>
+            <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                <li><strong>Admin:</strong> Full system access and management capabilities</li>
+                <li><strong>Teacher:</strong> Can manage courses, mark attendance, and view reports</li>
+                <li><strong>Student:</strong> Can view attendance, schedule, and personal information</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Form Card -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 md:p-8 max-w-3xl">
+    <form method="post">
+        @Html.AntiForgeryToken()
+        
+        <div class="space-y-6">
+            <!-- Full Name -->
+            <div>
+                <label asp-for="Input.FullName" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Full Name <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="Input.FullName" type="text" required
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                       placeholder="Enter full name">
+                <span asp-validation-for="Input.FullName" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label asp-for="Input.Email" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="Input.Email" type="email" required
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                       placeholder="email@example.com">
+                <span asp-validation-for="Input.Email" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label asp-for="Input.Password" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Password <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="Input.Password" type="password" required
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                       placeholder="Enter password (min 6 characters)">
+                <span asp-validation-for="Input.Password" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Role Selection -->
+            <div>
+                <label asp-for="Input.Role" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    User Role <span class="text-red-500">*</span>
+                </label>
+                <select asp-for="Input.Role" required id="roleSelect"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                    <option value="">-- Select Role --</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Student">Student</option>
+                </select>
+                <span asp-validation-for="Input.Role" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Teacher Fields (shown when role = Teacher) -->
+            <div id="teacherFields" class="hidden space-y-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                <h3 class="text-lg font-bold text-purple-800 dark:text-purple-200">Teacher Information</h3>
+                
+                <div>
+                    <label asp-for="Input.BadgeNumber" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Badge Number <span class="text-red-500">*</span>
+                    </label>
+                    <input asp-for="Input.BadgeNumber" type="text"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                           placeholder="e.g., TCH-001">
+                    <span asp-validation-for="Input.BadgeNumber" class="text-red-500 text-sm mt-1"></span>
+                </div>
+                
+                <div>
+                    <label asp-for="Input.Designation" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Designation
+                    </label>
+                    <input asp-for="Input.Designation" type="text"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                           placeholder="e.g., Assistant Professor, Lecturer">
+                    <span asp-validation-for="Input.Designation" class="text-red-500 text-sm mt-1"></span>
+                </div>
+            </div>
+
+            <!-- Student Fields (shown when role = Student) -->
+            <div id="studentFields" class="hidden space-y-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <h3 class="text-lg font-bold text-green-800 dark:text-green-200">Student Information</h3>
+                
+                <div>
+                    <label asp-for="Input.RollNo" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Roll Number <span class="text-red-500">*</span>
+                    </label>
+                    <input asp-for="Input.RollNo" type="text"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                           placeholder="e.g., 2023-CS-001">
+                    <span asp-validation-for="Input.RollNo" class="text-red-500 text-sm mt-1"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Input.FatherName" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Father's Name
+                    </label>
+                    <input asp-for="Input.FatherName" type="text"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                           placeholder="Enter father's name">
+                    <span asp-validation-for="Input.FatherName" class="text-red-500 text-sm mt-1"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Semester <span class="text-red-500">*</span>
+                    </label>
+                    <select id="semesterSelect"
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                            onchange="loadSections()">
+                        @foreach (var option in Model.SemesterOptions)
+                        {
+                            if (option.Disabled)
+                            {
+                                <option value="@option.Value" disabled selected>@option.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@option.Value">@option.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label asp-for="Input.SectionId" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Section <span class="text-red-500">*</span>
+                    </label>
+                    <select asp-for="Input.SectionId" id="sectionSelect"
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                            disabled>
+                        <option value="">-- Select semester first --</option>
+                    </select>
+                    <span asp-validation-for="Input.SectionId" class="text-red-500 text-sm mt-1"></span>
+                </div>
+            </div>
+
+            <!-- Validation Summary -->
+            <div asp-validation-summary="All" class="text-red-500 text-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-3"></div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Create User
+                </button>
+                <a href="/Admin/Users" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('roleSelect').addEventListener('change', function() {
+            const teacherFields = document.getElementById('teacherFields');
+            const studentFields = document.getElementById('studentFields');
+            const roleValue = this.value;
+
+            teacherFields.classList.add('hidden');
+            studentFields.classList.add('hidden');
+
+            if (roleValue === 'Teacher') {
+                teacherFields.classList.remove('hidden');
+            } else if (roleValue === 'Student') {
+                studentFields.classList.remove('hidden');
+            }
+        });
+        
+        async function loadSections() {
+            const semesterSelect = document.getElementById('semesterSelect');
+            const sectionSelect = document.getElementById('sectionSelect');
+            const selectedValue = semesterSelect.value;
+            
+            // Clear and disable section dropdown
+            sectionSelect.innerHTML = '<option value="">Loading...</option>';
+            sectionSelect.disabled = true;
+            
+            if (!selectedValue) {
+                sectionSelect.innerHTML = '<option value="">-- Select semester first --</option>';
+                return;
+            }
+            
+            // Parse semester and session from value (format: "semester|session")
+            const [semester, session] = selectedValue.split('|');
+            
+            try {
+                const response = await fetch(`?handler=Sections&semester=${semester}&session=${encodeURIComponent(session)}`);
+                const sections = await response.json();
+                
+                sectionSelect.innerHTML = '<option value="">-- Select section --</option>';
+                sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.value;
+                    option.textContent = section.text;
+                    sectionSelect.appendChild(option);
+                });
+                
+                sectionSelect.disabled = false;
+            } catch (error) {
+                console.error('Error loading sections:', error);
+                sectionSelect.innerHTML = '<option value="">Error loading sections</option>';
+            }
+        }
+    </script>
+}

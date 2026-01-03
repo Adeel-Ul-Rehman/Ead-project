@@ -1,0 +1,263 @@
+@model attendenceProject.Pages.Admin.Students.IndexModel
+
+<div class="space-y-6">
+    <!-- Filters -->
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+        <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                Filter Students
+            </h4>
+            <button onclick="clearFilters()" class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
+                Clear All
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <!-- Search -->
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Search</label>
+                <input type="text" id="studentSearchInput"
+                       class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                       placeholder="Name, email, or roll no...">
+            </div>
+
+            <!-- Badge Filter -->
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Badge</label>
+                <select id="studentBadgeFilter"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <option value="">All badges</option>
+                </select>
+            </div>
+
+            <!-- Semester Filter -->
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Semester</label>
+                <select id="studentSemesterFilter"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <option value="">All semesters</option>
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        <option value="@i">Semester @i</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Session Filter -->
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Session</label>
+                <select id="studentSessionFilter"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <option value="">All sessions</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+            Showing <span id="resultsInfo">loading...</span>
+        </p>
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+            <span id="filterStatus"></span>
+        </div>
+    </div>
+
+    <!-- Students Grid -->
+    <div id="studentsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamic content loaded here -->
+    </div>
+
+    <!-- Pagination Controls -->
+    <div id="paginationControls"></div>
+</div>
+
+<script>
+let pagination;
+
+function renderStudentCard(student) {
+    return `
+        <div id="student-${student.id}" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+            <!-- Header with Gradient -->
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 text-white">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white bg-opacity-20 rounded-full p-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">${student.fullName}</h3>
+                            <p class="text-blue-100 text-sm">${student.rollNo}</p>
+                        </div>
+                    </div>
+                    <span class="${student.isActive ? 'bg-green-500' : 'bg-red-500'} px-2 py-1 rounded-full text-xs font-semibold">
+                        ${student.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-4 flex-grow space-y-3">
+                <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="truncate">${student.email}</span>
+                </div>
+
+                ${student.fatherName ? `
+                <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span>Father: ${student.fatherName}</span>
+                </div>
+                ` : ''}
+
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 space-y-2">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Badge:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">${student.badgeName}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Semester:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">${student.semester}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Section:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">${student.sectionName}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Session:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">${student.session}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+                <a href="/Admin/Students/Profile?id=${student.id}" 
+                   class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg transition duration-200 text-sm font-medium">
+                    View Details
+                </a>
+                <button onclick="deleteStudent(${student.userId}, '${student.fullName}', ${student.id})" 
+                        class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition duration-200 text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function initializeStudentsPagination() {
+    pagination = new PaginationManager({
+        container: '#studentsGrid',
+        endpoint: '/Admin/Students/Index',
+        pageSize: 20,
+        filters: {
+            tab: 'all',
+            searchTerm: '',
+            badge: '',
+            semester: '',
+            session: ''
+        },
+        onRenderItem: renderStudentCard,
+        onDataLoaded: (data) => {
+            // Update badge filter options
+            const badgeFilter = document.getElementById('studentBadgeFilter');
+            const currentBadge = badgeFilter.value;
+            const badges = [...new Set(data.items.map(s => s.badgeName))].sort();
+            badgeFilter.innerHTML = '<option value="">All badges</option>' +
+                badges.map(b => `<option value="${b}" ${b === currentBadge ? 'selected' : ''}>${b}</option>`).join('');
+            
+            // Update session filter options
+            const sessionFilter = document.getElementById('studentSessionFilter');
+            const currentSession = sessionFilter.value;
+            const sessions = [...new Set(data.items.map(s => s.session))].sort().reverse();
+            sessionFilter.innerHTML = '<option value="">All sessions</option>' +
+                sessions.map(s => `<option value="${s}" ${s === currentSession ? 'selected' : ''}>${s}</option>`).join('');
+        },
+        itemIdPrefix: 'student'
+    });
+}
+
+function applyFilters() {
+    const searchTerm = document.getElementById('studentSearchInput').value;
+    const badge = document.getElementById('studentBadgeFilter').value;
+    const semester = document.getElementById('studentSemesterFilter').value;
+    const session = document.getElementById('studentSessionFilter').value;
+    
+    pagination.updateFilters({
+        tab: 'all',
+        searchTerm,
+        badge,
+        semester,
+        session
+    });
+}
+
+function clearFilters() {
+    document.getElementById('studentSearchInput').value = '';
+    document.getElementById('studentBadgeFilter').value = '';
+    document.getElementById('studentSemesterFilter').value = '';
+    document.getElementById('studentSessionFilter').value = '';
+    applyFilters();
+}
+
+async function deleteStudent(userId, studentName, studentId) {
+    if (!confirm(`Are you sure you want to delete ${studentName}?\n\nThis action cannot be undone.`)) {
+        return;
+    }
+    
+    Loading.show('Deleting student...');
+    
+    try {
+        const response = await fetch(`/Admin/Students/Index?handler=DeleteStudent&id=${userId}`, {
+            method: 'POST',
+            headers: {
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            Toast.success(result.message);
+            pagination.removeItem(`student-${studentId}`);
+        } else {
+            Toast.error(result.message);
+        }
+    } catch (error) {
+        console.error('Delete error:', error);
+        Toast.error('Failed to delete student');
+    } finally {
+        Loading.hide();
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('studentsGrid')) {
+        initializeStudentsPagination();
+        
+        // Setup filter event listeners with debounce for search
+        const searchInput = document.getElementById('studentSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', debounce(applyFilters, 500));
+        }
+        
+        document.getElementById('studentBadgeFilter').addEventListener('change', applyFilters);
+        document.getElementById('studentSemesterFilter').addEventListener('change', applyFilters);
+        document.getElementById('studentSessionFilter').addEventListener('change', applyFilters);
+    }
+});
+</script>

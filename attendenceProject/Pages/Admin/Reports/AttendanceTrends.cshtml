@@ -1,0 +1,132 @@
+@page
+@model attendenceProject.Pages.Admin.Reports.AttendanceTrendsModel
+@{
+    ViewData["Title"] = "Attendance Trends Report";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    var trends = Model.ViewType == "weekly" ? Model.WeeklyTrends : Model.MonthlyTrends;
+}
+
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">📉 Attendance Trends Report</h1>
+        <a asp-page="Index" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
+            ← Back to Reports
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">🔍 Filters</h2>
+        <form method="get">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
+                    <input type="date" asp-for="StartDate" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label>
+                    <input type="date" asp-for="EndDate" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">View Type</label>
+                    <select asp-for="ViewType" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
+                        <option value="weekly">Weekly Trends</option>
+                        <option value="monthly">Monthly Trends</option>
+                    </select>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                        Apply
+                    </button>
+                    <a asp-page="AttendanceTrends" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
+                        Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Export Button -->
+    <div class="mb-6">
+        <a asp-page-handler="ExportCsv" asp-all-route-data="@(new Dictionary<string, string> { 
+            ["StartDate"] = Model.StartDate?.ToString("yyyy-MM-dd") ?? "", 
+            ["EndDate"] = Model.EndDate?.ToString("yyyy-MM-dd") ?? "",
+            ["ViewType"] = Model.ViewType
+        })" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition">
+            📥 Export CSV
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    @if (trends.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                <p class="text-sm opacity-90 mb-1">Total Periods</p>
+                <p class="text-4xl font-bold">@trends.Count</p>
+            </div>
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+                <p class="text-sm opacity-90 mb-1">Avg Attendance</p>
+                <p class="text-4xl font-bold">@Math.Round(trends.Average(t => t.AttendancePercentage), 1)%</p>
+            </div>
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                <p class="text-sm opacity-90 mb-1">Total Lectures</p>
+                <p class="text-4xl font-bold">@trends.Sum(t => t.TotalLectures)</p>
+            </div>
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+                <p class="text-sm opacity-90 mb-1">Current Trend</p>
+                <p class="text-2xl font-bold">@(trends.Last().Trend)</p>
+            </div>
+        </div>
+    }
+
+    <!-- Trends Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Period</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Lectures</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Present</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Absent</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Leave</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Attendance %</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Trend</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    @if (trends.Any())
+                    {
+                        @foreach (var trend in trends)
+                        {
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">@trend.Period</td>
+                                <td class="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white">@trend.TotalLectures</td>
+                                <td class="px-6 py-4 text-center text-sm text-green-600 font-semibold">@trend.PresentCount</td>
+                                <td class="px-6 py-4 text-center text-sm text-red-600 font-semibold">@trend.AbsentCount</td>
+                                <td class="px-6 py-4 text-center text-sm text-yellow-600 font-semibold">@trend.LeaveCount</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full @(trend.AttendancePercentage >= 75 ? "bg-green-100 text-green-800" : trend.AttendancePercentage >= 65 ? "bg-blue-100 text-blue-800" : trend.AttendancePercentage >= 50 ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800")">
+                                        @trend.AttendancePercentage%
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center text-sm font-semibold @(trend.Trend.Contains("Up") ? "text-green-600" : trend.Trend.Contains("Down") ? "text-red-600" : "text-gray-600")">
+                                    @trend.Trend
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                No trend data found for the selected period.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

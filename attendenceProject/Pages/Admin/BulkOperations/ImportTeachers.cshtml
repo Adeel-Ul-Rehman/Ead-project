@@ -1,0 +1,224 @@
+@page
+@model attendenceProject.Pages.Admin.BulkOperations.ImportTeachersModel
+@{
+    ViewData["Title"] = "Bulk Import Teachers";
+}
+
+<style>
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    
+    .gradient-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .gradient-info {
+        background: linear-gradient(135deg, #667eea 0%, #4c51bf 100%);
+    }
+    
+    .gradient-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: all 0.3s ease;
+    }
+    
+    .gradient-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .gradient-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .gradient-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .upload-area {
+        border: 3px dashed #cbd5e1;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    }
+</style>
+
+<div class="container mx-auto px-4 py-8 fade-in">
+    <div class="max-w-4xl mx-auto">
+        <!-- Modern Gradient Header -->
+        <div class="gradient-header rounded-2xl shadow-2xl p-8 mb-8 text-white">
+            <div class="flex items-center gap-4 mb-3">
+                <div class="text-5xl">👨‍🏫📥</div>
+                <div>
+                    <h1 class="text-4xl font-bold">Bulk Import Teachers</h1>
+                    <p class="text-blue-100 mt-2">Upload CSV file to import multiple teachers at once</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Instructions Card -->
+        <div class="gradient-info rounded-xl shadow-lg p-6 mb-8 text-white fade-in">
+            <div class="flex items-start gap-4">
+                <div class="text-3xl">📋</div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold mb-3">CSV File Format Requirements</h3>
+                    <p class="text-blue-100 mb-3">Your CSV file must include these columns in order:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                            <strong class="text-blue-100">FullName</strong>
+                            <p class="text-sm text-blue-200 mt-1">Teacher's complete name</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                            <strong class="text-blue-100">Email</strong>
+                            <p class="text-sm text-blue-200 mt-1">Unique email (for login)</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                            <strong class="text-blue-100">BadgeNumber</strong>
+                            <p class="text-sm text-blue-200 mt-1">Teacher's badge/employee ID</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                            <strong class="text-blue-100">Department</strong>
+                            <p class="text-sm text-blue-200 mt-1">Department name</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Template Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 fade-in">
+            <div class="flex items-start gap-4 mb-6">
+                <svg class="w-12 h-12 text-green-600 dark:text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Download Template</h2>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Download the CSV template to ensure correct format</p>
+                    <a href="/Admin/BulkOperations/ImportTeachers?handler=DownloadTemplate" class="gradient-success inline-flex items-center gap-3 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download Template CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modern Upload Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <span>Upload CSV File</span>
+            </h2>
+
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Select CSV File <span class="text-red-500">*</span>
+                    </label>
+                    <div class="upload-area rounded-xl p-8 text-center dark:border-gray-600">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <input type="file" name="csvFile" accept=".csv" required 
+                               class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 
+                                      file:mr-4 file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold 
+                                      file:bg-gradient-to-r file:from-indigo-500 file:to-purple-600 file:text-white hover:file:from-indigo-600 hover:file:to-purple-700 file:transition file:duration-200" />
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-3">Drag and drop or click to browse</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button type="submit" class="gradient-button flex-1 text-white font-bold px-8 py-4 rounded-xl shadow-lg transition duration-300 flex items-center justify-center gap-3 text-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        Upload and Import
+                    </button>
+                    <a href="/Admin/Dashboard" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-semibold px-8 py-4 rounded-xl transition duration-300">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modern Results Display -->
+        @if (Model.ImportResults != null && Model.ImportResults.Any())
+        {
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                    <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span>Import Results</span>
+                </h2>
+                
+                <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 p-6 rounded-xl shadow-lg transform hover:scale-105 transition duration-300">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-sm font-semibold text-green-600 dark:text-green-300">Successful</p>
+                            <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <p class="text-4xl font-bold text-green-800 dark:text-green-200">@Model.ImportResults.Count(r => r.Success)</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 p-6 rounded-xl shadow-lg transform hover:scale-105 transition duration-300">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-sm font-semibold text-red-600 dark:text-red-300">Failed</p>
+                            <svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <p class="text-4xl font-bold text-red-800 dark:text-red-200">@Model.ImportResults.Count(r => !r.Success)</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 p-6 rounded-xl shadow-lg transform hover:scale-105 transition duration-300">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-sm font-semibold text-blue-600 dark:text-blue-300">Total Processed</p>
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <p class="text-4xl font-bold text-blue-800 dark:text-blue-200">@Model.ImportResults.Count</p>
+                    </div>
+                </div>
+
+                @if (Model.ImportResults.Any(r => !r.Success))
+                {
+                    <div class="mt-6 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-red-600 dark:text-red-400 mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            Errors
+                        </h3>
+                        <div class="space-y-3 max-h-96 overflow-y-auto">
+                            @foreach (var result in Model.ImportResults.Where(r => !r.Success))
+                            {
+                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-red-500 shadow-md">
+                                    <p class="text-sm text-red-800 dark:text-red-200">
+                                        <strong class="font-bold">Row @result.RowNumber:</strong> @result.ErrorMessage
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,193 @@
+@page
+@model attendenceProject.Pages.Admin.Users.EditModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<!-- Header Section -->
+<div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2 sm:gap-3">
+        <span class="text-3xl sm:text-4xl md:text-5xl">✏️</span>
+        <span>Edit User</span>
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2 text-base sm:text-lg">Update user information</p>
+</div>
+
+<!-- Warning Card -->
+@if (Model.HasRelatedData)
+{
+    <div class="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-500 p-4 sm:p-6 rounded-lg shadow-md mb-6 max-w-3xl">
+        <div class="flex items-start">
+            <svg class="w-6 h-6 text-yellow-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <div>
+                <h4 class="text-sm font-bold text-yellow-800 dark:text-yellow-200 mb-2">Warning: User has related data</h4>
+                <ul class="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
+                    @if (Model.Input.Role == "Teacher" && Model.TeacherCourseCount > 0)
+                    {
+                        <li>Teacher has <strong>@Model.TeacherCourseCount course assignment(s)</strong></li>
+                    }
+                    @if (Model.Input.Role == "Student" && Model.AttendanceRecordCount > 0)
+                    {
+                        <li>Student has <strong>@Model.AttendanceRecordCount attendance record(s)</strong></li>
+                    }
+                </ul>
+                <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
+                    <strong>Note:</strong> Changing the role will not delete related data automatically.
+                </p>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Form Card -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 md:p-8 max-w-3xl">
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Input.Id" />
+        
+        <div class="space-y-6">
+            <!-- Full Name -->
+            <div>
+                <label asp-for="Input.FullName" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Full Name <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="Input.FullName" type="text" required
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                <span asp-validation-for="Input.FullName" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label asp-for="Input.Email" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="Input.Email" type="email" required
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                <span asp-validation-for="Input.Email" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Password (Optional) -->
+            <div>
+                <label asp-for="Input.Password" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    New Password (Leave blank to keep current)
+                </label>
+                <input asp-for="Input.Password" type="password"
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                       placeholder="Enter new password (min 6 characters)">
+                <span asp-validation-for="Input.Password" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Role Selection -->
+            <div>
+                <label asp-for="Input.Role" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    User Role <span class="text-red-500">*</span>
+                </label>
+                <select asp-for="Input.Role" required id="roleSelect"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                    <option value="Admin">Admin</option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Student">Student</option>
+                </select>
+                <span asp-validation-for="Input.Role" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Teacher Fields (shown when role = Teacher) -->
+            <div id="teacherFields" class="@(Model.Input.Role == "Teacher" ? "" : "hidden") space-y-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                <h3 class="text-lg font-bold text-purple-800 dark:text-purple-200">Teacher Information</h3>
+                
+                <div>
+                    <label asp-for="Input.Designation" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Designation
+                    </label>
+                    <input asp-for="Input.Designation" type="text"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                           placeholder="e.g., Assistant Professor, Lecturer">
+                    <span asp-validation-for="Input.Designation" class="text-red-500 text-sm mt-1"></span>
+                </div>
+            </div>
+
+            <!-- Student Fields (shown when role = Student) -->
+            <div id="studentFields" class="@(Model.Input.Role == "Student" ? "" : "hidden") space-y-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <h3 class="text-lg font-bold text-green-800 dark:text-green-200">Student Information</h3>
+                
+                <div>
+                    <label asp-for="Input.RollNo" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Roll Number <span class="text-red-500">*</span>
+                    </label>
+                    <input asp-for="Input.RollNo" type="text"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                           placeholder="e.g., 2023-CS-001">
+                    <span asp-validation-for="Input.RollNo" class="text-red-500 text-sm mt-1"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Input.FatherName" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Father's Name
+                    </label>
+                    <input asp-for="Input.FatherName" type="text"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                           placeholder="Enter father's name">
+                    <span asp-validation-for="Input.FatherName" class="text-red-500 text-sm mt-1"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Input.SectionId" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                        Section <span class="text-red-500">*</span>
+                    </label>
+                    <select asp-for="Input.SectionId"
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                        <option value="">-- Select Section --</option>
+                        @foreach (var sec in Model.Sections)
+                        {
+                            <option value="@sec.Id">
+                                @sec.Badge.Name - Semester @sec.Semester - @sec.Name (@sec.Session)
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.SectionId" class="text-red-500 text-sm mt-1"></span>
+                </div>
+            </div>
+
+            <!-- Validation Summary -->
+            <div asp-validation-summary="All" class="text-red-500 text-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-3"></div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Update User
+                </button>
+                <a href="/Admin/Users" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('roleSelect').addEventListener('change', function() {
+            const teacherFields = document.getElementById('teacherFields');
+            const studentFields = document.getElementById('studentFields');
+            const roleValue = this.value;
+
+            teacherFields.classList.add('hidden');
+            studentFields.classList.add('hidden');
+
+            if (roleValue === 'Teacher') {
+                teacherFields.classList.remove('hidden');
+            } else if (roleValue === 'Student') {
+                studentFields.classList.remove('hidden');
+            }
+        });
+    </script>
+}

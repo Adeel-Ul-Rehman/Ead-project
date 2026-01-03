@@ -1,0 +1,252 @@
+@page
+@model attendenceProject.Pages.Teacher.TimetableModel
+@{
+    ViewData["Title"] = "My Timetable";
+}
+
+<!-- Header Section -->
+<div class="mb-6">
+    <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl shadow-lg p-4 text-white">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-white bg-opacity-20 p-2 rounded-lg backdrop-blur-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">My Timetable</h1>
+                    <p class="text-white text-opacity-90 text-xs">Your weekly class schedule</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="/Teacher/Timetable?mode=day" class="@(Model.ViewMode == "day" ? "bg-white text-indigo-600" : "bg-white bg-opacity-20 text-white hover:bg-opacity-30") font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center gap-1.5 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Today
+                </a>
+                <a href="/Teacher/Timetable?mode=week" class="@(Model.ViewMode == "week" ? "bg-white text-indigo-600" : "bg-white bg-opacity-20 text-white hover:bg-opacity-30") font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center gap-1.5 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Week
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.ViewMode == "week")
+{
+    <!-- Week View -->
+    <div class="grid grid-cols-1 gap-4">
+        @foreach (var daySchedule in Model.WeekSchedule)
+        {
+            var isToday = daySchedule.Day == DateTime.Today.DayOfWeek.ToString();
+            var dayColors = new Dictionary<string, string> {
+                {"Monday", "from-blue-500 to-blue-600"},
+                {"Tuesday", "from-green-500 to-green-600"},
+                {"Wednesday", "from-yellow-500 to-yellow-600"},
+                {"Thursday", "from-purple-500 to-purple-600"},
+                {"Friday", "from-pink-500 to-pink-600"},
+                {"Saturday", "from-indigo-500 to-indigo-600"},
+                {"Sunday", "from-red-500 to-red-600"}
+            };
+            var bgColor = dayColors.ContainsKey(daySchedule.Day) ? dayColors[daySchedule.Day] : "from-gray-500 to-gray-600";
+            if (isToday) bgColor = "from-emerald-500 to-teal-600";
+            
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gradient-to-r @bgColor p-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <h2 class="text-lg font-bold text-white">@daySchedule.Day</h2>
+                            <span class="text-white text-opacity-80 text-xs">(@daySchedule.Rules.Count() @(daySchedule.Rules.Count() == 1 ? "class" : "classes"))</span>
+                        </div>
+                        @if (isToday)
+                        {
+                            <span class="bg-white text-emerald-600 px-2 py-1 rounded-md font-semibold text-xs">Today</span>
+                        }
+                    </div>
+                </div>
+                
+                <div class="p-3">
+                    @if (daySchedule.Rules.Any())
+                    {
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            @foreach (var rule in daySchedule.Rules)
+                            {
+                                var classColors = new[] { "blue", "green", "purple", "pink", "indigo", "yellow" };
+                                var colorIndex = Math.Abs(rule.TeacherCourse.Course.Code.GetHashCode()) % classColors.Length;
+                                var color = classColors[colorIndex];
+                                
+                                <div class="group bg-gradient-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-lg p-3 border-l-3 border-@(color)-500 hover:shadow-md transition-all">
+                                    <div class="flex gap-2">
+                                        <div class="flex-shrink-0">
+                                            <div class="bg-@(color)-500 p-1.5 rounded-md">
+                                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="text-sm font-bold text-gray-900 dark:text-white truncate mb-1">
+                                                @rule.TeacherCourse.Course.Title
+                                            </h3>
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <span class="text-xs font-mono bg-@(color)-100 dark:bg-@(color)-900 text-@(color)-700 dark:text-@(color)-300 px-2 py-0.5 rounded">
+                                                    @rule.TeacherCourse.Course.Code
+                                                </span>
+                                                @if (rule.TeacherCourse.Course.IsLab)
+                                                {
+                                                    <span class="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">Lab</span>
+                                                }
+                                            </div>
+                                            
+                                            <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+                                                <div class="flex items-center gap-1">
+                                                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                    </svg>
+                                                    <span class="text-gray-600 dark:text-gray-300">@rule.TeacherCourse.Section.Name</span>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                                    </svg>
+                                                    <span class="text-gray-600 dark:text-gray-300">Room @rule.Room</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                                                <div class="bg-@(color)-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                                                    @rule.StartTime.ToString(@"hh\:mm")
+                                                </div>
+                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                                </svg>
+                                                <div class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                                                    @rule.StartTime.Add(TimeSpan.FromMinutes(rule.DurationMinutes)).ToString(@"hh\:mm")
+                                                </div>
+                                                <span class="text-xs text-gray-500 ml-auto">(@rule.DurationMinutes min)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-6">
+                            <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                            <p class="text-gray-400 text-xs">No classes</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <!-- Day View (Today) -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 p-3">
+            <div class="flex items-center justify-between text-white">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h2 class="text-lg font-bold">Today's Schedule</h2>
+                        <p class="text-white text-opacity-80 text-xs">@DateTime.Today.ToString("MMM dd") • @Model.TodayRules.Count() @(Model.TodayRules.Count() == 1 ? "class" : "classes")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-3">
+            @if (Model.TodayRules.Any())
+            {
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    @for (int i = 0; i < Model.TodayRules.Count(); i++)
+                    {
+                        var rule = Model.TodayRules.ToList()[i];
+                        var classColors = new[] { "emerald", "blue", "purple", "pink", "indigo", "amber" };
+                        var color = classColors[i % classColors.Length];
+                        
+                        <div class="relative bg-gradient-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-lg p-3 border-l-3 border-@(color)-500 hover:shadow-md transition-all">
+                            <div class="flex gap-2">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-@(color)-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                                        @(i + 1)
+                                    </div>
+                                </div>
+                                
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-sm font-bold text-gray-900 dark:text-white truncate mb-1">
+                                        @rule.TeacherCourse.Course.Title
+                                    </h3>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-xs font-mono bg-@(color)-100 dark:bg-@(color)-900 text-@(color)-700 dark:text-@(color)-300 px-2 py-0.5 rounded">
+                                            @rule.TeacherCourse.Course.Code
+                                        </span>
+                                        @if (rule.TeacherCourse.Course.IsLab)
+                                        {
+                                            <span class="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">Lab</span>
+                                        }
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                            </svg>
+                                            <span class="text-gray-600 dark:text-gray-300">@rule.TeacherCourse.Section.Name</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                            </svg>
+                                            <span class="text-gray-600 dark:text-gray-300">Room @rule.Room</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                                        <div class="bg-@(color)-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                                            @DateTime.Today.Add(rule.StartTime).ToString("hh:mm tt")
+                                        </div>
+                                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                        </svg>
+                                        <div class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                                            @DateTime.Today.Add(rule.StartTime).AddMinutes(rule.DurationMinutes).ToString("hh:mm tt")
+                                        </div>
+                                        <span class="text-xs text-gray-500 ml-auto">@rule.DurationMinutes min</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-gray-500 text-sm font-semibold">No classes today!</p>
+                    <p class="text-gray-400 text-xs mt-1">Enjoy your free day</p>
+                </div>
+            }
+        </div>
+    </div>
+}

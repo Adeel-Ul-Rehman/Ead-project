@@ -1,0 +1,139 @@
+@page
+@model attendenceProject.Pages.Admin.TeacherCourses.EditModel
+@{
+    ViewData["Title"] = "Edit Course Assignment";
+}
+
+<!-- Header Section -->
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+        <span class="text-5xl">✏️</span>
+        <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Edit Course Assignment</span>
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">Update teacher, course, or section for this assignment</p>
+</div>
+
+<!-- Info Card -->
+<div class="bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-6 rounded-xl shadow-md mb-8">
+    <div class="flex items-start">
+        <div class="flex-shrink-0">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <div class="ml-4">
+            <h4 class="text-lg font-bold text-blue-900 dark:text-blue-200 mb-2">Edit Assignment</h4>
+            <p class="text-sm text-blue-800 dark:text-blue-300">You can modify the teacher, course, or section for this assignment. Note that changing these details may affect existing timetable rules and lectures.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Form Card -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Input.Id" />
+        
+        <div class="space-y-6">
+            <!-- Current Assignment Info -->
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Current Assignment</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Teacher</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">@Model.CurrentAssignment?.Teacher.User.FullName</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Course</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">@Model.CurrentAssignment?.Course.Code - @Model.CurrentAssignment?.Course.Title</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Section</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">@Model.CurrentAssignment?.Section.Badge.Name - Sem @Model.CurrentAssignment?.Section.Semester - @Model.CurrentAssignment?.Section.Name</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Selection -->
+            <div>
+                <label asp-for="Input.SectionId" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Section <span class="text-red-500">*</span>
+                </label>
+                <select asp-for="Input.SectionId" required id="sectionSelect"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                    <option value="">-- Select Section --</option>
+                    @foreach (var sec in Model.AllSections)
+                    {
+                        <option value="@sec.Id" selected="@(Model.Input.SectionId == sec.Id)">
+                            @sec.Badge.Name - Semester @sec.Semester - @sec.Name (@sec.Session)
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Input.SectionId" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Course Selection -->
+            <div>
+                <label asp-for="Input.CourseId" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Course <span class="text-red-500">*</span>
+                </label>
+                <select asp-for="Input.CourseId" required id="courseSelect"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                    <option value="">-- Select Course --</option>
+                    @foreach (var course in Model.AllCourses)
+                    {
+                        <option value="@course.Id" selected="@(Model.Input.CourseId == course.Id)">
+                            @course.Code - @course.Title (@(course.IsLab ? "Lab" : "Theory")) - @course.CreditHours CH
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Input.CourseId" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Teacher Selection -->
+            <div>
+                <label asp-for="Input.TeacherId" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Teacher <span class="text-red-500">*</span>
+                </label>
+                <select asp-for="Input.TeacherId" required id="teacherSelect"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200">
+                    <option value="">-- Select Teacher --</option>
+                    @foreach (var teacher in Model.AllTeachers)
+                    {
+                        <option value="@teacher.Id" selected="@(Model.Input.TeacherId == teacher.Id)">
+                            @teacher.User.FullName
+                            @if (!string.IsNullOrEmpty(teacher.Designation))
+                            {
+                                <span>(@teacher.Designation)</span>
+                            }
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Input.TeacherId" class="text-red-500 text-sm mt-1"></span>
+            </div>
+
+            <!-- Validation Summary -->
+            <div asp-validation-summary="All" class="text-red-500 text-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4"></div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Save Changes
+                </button>
+                <a href="/Admin/TeacherCourses" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

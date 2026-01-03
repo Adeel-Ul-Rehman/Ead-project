@@ -1,0 +1,133 @@
+@page "{id:int}"
+@model attendenceProject.Pages.Admin.Students.ProfileModel
+@{
+    ViewData["Title"] = "Student Profile";
+}
+
+<div class="mb-6">
+    <a href="/Admin/Users" class="text-blue-600 hover:text-blue-800 flex items-center gap-2 mb-4">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Users
+    </a>
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Student Profile</h1>
+</div>
+
+<!-- Student Info Card -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <div class="flex items-start justify-between mb-6">
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-100 dark:bg-blue-900 rounded-full p-4">
+                <svg class="w-12 h-12 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">@Model.Student.User.FullName</h2>
+                <p class="text-gray-600 dark:text-gray-400">@Model.Student.User.Email</p>
+                <span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                    @(Model.Student.User.IsActive ? "Active" : "Inactive")
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 uppercase mb-1">Roll Number</p>
+            <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.Student.RollNo</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 uppercase mb-1">Badge/Department</p>
+            <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.Student.Section?.Badge?.Name</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 uppercase mb-1">Section</p>
+            <p class="text-lg font-semibold text-gray-800 dark:text-white">@Model.Student.Section?.Name - @Model.Student.Section?.Session</p>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-blue-100 text-sm uppercase">Total Lectures</p>
+                <p class="text-3xl font-bold mt-2">@Model.TotalLectures</p>
+            </div>
+            <svg class="w-12 h-12 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-green-100 text-sm uppercase">Present</p>
+                <p class="text-3xl font-bold mt-2">@Model.PresentCount</p>
+            </div>
+            <svg class="w-12 h-12 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-red-100 text-sm uppercase">Absent</p>
+                <p class="text-3xl font-bold mt-2">@Model.AbsentCount</p>
+            </div>
+            <svg class="w-12 h-12 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-purple-100 text-sm uppercase">Attendance %</p>
+                <p class="text-3xl font-bold mt-2">@Model.AttendancePercentage%</p>
+            </div>
+            <svg class="w-12 h-12 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<!-- Course-wise Attendance -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Course-wise Attendance</h3>
+    
+    @if (Model.CourseAttendance.Any())
+    {
+        <div class="space-y-4">
+            @foreach (var course in Model.CourseAttendance)
+            {
+                <div class="border-l-4 @(course.Percentage >= 75 ? "border-green-500" : course.Percentage >= 65 ? "border-yellow-500" : "border-red-500") bg-gray-50 dark:bg-gray-700 p-4 rounded">
+                    <div class="flex justify-between items-center mb-2">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">@course.CourseName</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">@course.Present/@course.Total lectures</p>
+                        </div>
+                        <span class="text-2xl font-bold @(course.Percentage >= 75 ? "text-green-600" : course.Percentage >= 65 ? "text-yellow-600" : "text-red-600")">
+                            @course.Percentage%
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="@(course.Percentage >= 75 ? "bg-green-500" : course.Percentage >= 65 ? "bg-yellow-500" : "bg-red-500") h-2 rounded-full" style="width: @course.Percentage%"></div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-gray-600 dark:text-gray-400 text-center py-8">No attendance records found</p>
+    }
+</div>
