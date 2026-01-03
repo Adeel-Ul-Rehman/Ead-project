@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "attendance-management-system",
+    "env": [
+      {
+        "key": "ASPNETCORE_ENVIRONMENT",
+        "value": "Production"
+      },
+      {
+        "key": "ASPNETCORE_URLS",
+        "value": "http://+:8080"
+      }
+    ],
+    "ports": [
+      {
+        "port": 8080,
+        "protocol": "http"
+      }
+    ],
+    "healthcheck": {
+      "http": {
+        "port": 8080,
+        "path": "/"
+      }
+    }
+  }
+}
