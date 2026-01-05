@@ -60,6 +60,14 @@ namespace attendenceProject.Pages.Admin.Reports
                 .Where(ar => lectures.Select(l => l.Id).Contains(ar.LectureId))
                 .ToListAsync();
 
+            // Get student counts per section
+            var sectionIds = lectures.Select(l => l.TimetableRule?.TeacherCourse?.SectionId).Distinct().Where(id => id.HasValue).Select(id => id.Value).ToList();
+            var sectionStudentCounts = await _context.Students
+                .Where(s => sectionIds.Contains(s.SectionId))
+                .GroupBy(s => s.SectionId)
+                .Select(g => new { SectionId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.SectionId, g => g.Count);
+
             if (ViewType == "weekly")
             {
                 await GenerateWeeklyTrends(lectures, attendanceRecords);
@@ -89,7 +97,7 @@ namespace attendenceProject.Pages.Admin.Reports
                 var absentCount = weekRecords.Count(ar => ar.Status == "Absent");
                 var leaveCount = weekRecords.Count(ar => ar.Status == "Leave");
 
-                var expectedRecords = weekLectures.Sum(l => _context.Students.Count(s => s.SectionId == l.TimetableRule.TeacherCourse.SectionId));
+                var expectedRecords = weekLectures.Sum(l => sectionStudentCounts.TryGetValue(l.TimetableRule?.TeacherCourse?.SectionId ?? 0, out int count) ? count : 0);
                 var attendancePercentage = expectedRecords > 0
                     ? Math.Round((double)presentCount / expectedRecords * 100, 2)
                     : 0;
@@ -141,7 +149,7 @@ namespace attendenceProject.Pages.Admin.Reports
                 var absentCount = monthRecords.Count(ar => ar.Status == "Absent");
                 var leaveCount = monthRecords.Count(ar => ar.Status == "Leave");
 
-                var expectedRecords = monthLectures.Sum(l => _context.Students.Count(s => s.SectionId == l.TimetableRule.TeacherCourse.SectionId));
+                var expectedRecords = monthLectures.Sum(l => sectionStudentCounts.TryGetValue(l.TimetableRule?.TeacherCourse?.SectionId ?? 0, out int count) ? count : 0);
                 var attendancePercentage = expectedRecords > 0
                     ? Math.Round((double)presentCount / expectedRecords * 100, 2)
                     : 0;
