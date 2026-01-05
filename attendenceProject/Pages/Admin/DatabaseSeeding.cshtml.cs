@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace attendenceProject.Pages.Admin;
 
-[Authorize(Roles = "Admin")]
+// [Authorize(Roles = "Admin")]
 public class DatabaseSeedingModel : PageModel
 {
     private readonly ApplicationDbContext _context;
