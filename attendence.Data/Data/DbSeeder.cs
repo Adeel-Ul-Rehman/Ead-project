@@ -17,8 +17,8 @@ public static class DbSeeder
         var adminUser = new User
         {
             FullName = "Admin User",
-            Email = "admin@university.edu",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+            Email = "admin@uni.edu",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
             Role = "Admin",
             CreatedAt = DateTime.Now
         };
@@ -27,9 +27,9 @@ public static class DbSeeder
         // Create Teacher User
         var teacherUser = new User
         {
-            FullName = "John Teacher",
-            Email = "teacher@university.edu",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+            FullName = "Ali Raza",
+            Email = "ali.raza@uni.edu",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("teacher123"),
             Role = "Teacher",
             CreatedAt = DateTime.Now
         };
@@ -70,9 +70,9 @@ public static class DbSeeder
         // Create Student User
         var studentUser = new User
         {
-            FullName = "Alice Student",
-            Email = "student@university.edu",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+            FullName = "Ahmed Bilal",
+            Email = "ahmed.bilal@uni.edu",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("student123"),
             Role = "Student",
             CreatedAt = DateTime.Now
         };
