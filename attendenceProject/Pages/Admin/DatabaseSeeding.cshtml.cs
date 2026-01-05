@@ -37,6 +37,22 @@ public class DatabaseSeedingModel : PageModel
             // Step 1: Clean database except Admin
             await CleanDatabase();
 
+            // Ensure Admin exists
+            if (!await _context.Users.AnyAsync(u => u.Role == "Admin"))
+            {
+                var adminUser = new User
+                {
+                    FullName = "Admin User",
+                    Email = "admin@uni.edu",
+                    PasswordHash = _passwordHasher.HashPassword("admin123"),
+                    Role = "Admin",
+                    IsActive = true,
+                    CreatedAt = DateTime.Now
+                };
+                _context.Users.Add(adminUser);
+                await _context.SaveChangesAsync();
+            }
+
             // Step 2: Create Badges
             var badges = await CreateBadges();
 
