@@ -213,6 +213,8 @@ public class DatabaseSeedingModel : PageModel
     {
         var teacherData = new[]
         {
+            new { Email = "ali.raza@uni.edu", Name = "Ali Raza", Designation = "Assistant Professor" },
+            new { Email = "sara.khan@uni.edu", Name = "Sara Khan", Designation = "Lecturer" },
             new { Email = "ajadeel229@gmail.com", Name = "Hafiz Danish", Designation = "Professor" },
             new { Email = "annieeve749@gmail.com", Name = "Alina Munir", Designation = "Associate professor" },
             new { Email = "rehmantanzeel052@gmail.com", Name = "Muhammad Nadeem", Designation = "Professor" },
@@ -220,9 +222,7 @@ public class DatabaseSeedingModel : PageModel
             new { Email = "vibedchecking@gmail.com", Name = "Miss Rida", Designation = "Lecturer" },
             new { Email = "dominoriderexpense@gmail.com", Name = "Hira Azam", Designation = "senior lecturer" },
             new { Email = "zackcrriss@gmail.com", Name = "Miss Maryam", Designation = "lecturer" },
-            new { Email = "syedshayanarshad.1@gmail.com", Name = "Miss Anam", Designation = "associate professor" },
-            new { Email = "hadeedhaider59@gmail.com", Name = "miss Ayesha", Designation = "Professor" },
-            new { Email = "aneebullah66@gmail.com", Name = "Umer Qasim", Designation = "professor" }
+            new { Email = "syedshayanarshad.1@gmail.com", Name = "Miss Anam", Designation = "associate professor" }
         };
 
         var teachers = new List<attendence.Domain.Entities.Teacher>();
