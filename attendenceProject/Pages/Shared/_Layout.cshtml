@@ -28,25 +28,24 @@
             }
         }
     </script>
-    <style>        /* REMOVE ALL FOCUS RINGS AND BLUE BORDERS */
+    <style>        /* Improved Focus States for Accessibility */
         * {
             outline: none !important;
         }
-        *:focus, *:active, *:focus-visible, *:focus-within {
-            outline: none !important;
-            box-shadow: none !important;
-            --tw-ring-shadow: 0 0 #0000 !important;
-            --tw-ring-offset-shadow: 0 0 #0000 !important;
+        *:focus, *:active, *:focus-visible {
+            outline: 2px solid #3b82f6 !important;
+            outline-offset: 2px !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
         }
-        input:focus, select:focus, textarea:focus, button:focus, 
-        input:active, select:active, textarea:active, button:active,
-        input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
-            outline: none !important;
-            box-shadow: none !important;
-            --tw-ring-shadow: 0 0 #0000 !important;
-            --tw-ring-offset-shadow: 0 0 #0000 !important;
-            --tw-ring-color: transparent !important;
-            --tw-ring-opacity: 0 !important;
+        input:focus, select:focus, textarea:focus, button:focus {
+            outline: 2px solid #3b82f6 !important;
+            outline-offset: 2px !important;
+            border-color: #3b82f6 !important;
+        }
+        /* Keep navigation clean */
+        .nav-link:focus {
+            outline: 2px solid #3b82f6 !important;
+            outline-offset: -2px !important;
         }
                 @@keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
@@ -76,13 +75,13 @@
     @if (User.Identity?.IsAuthenticated == true)
     {
         <!-- Top Navigation Bar -->
-        <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50">
+        <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50" role="navigation" aria-label="Main navigation">
             <div class="px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo & Brand -->
                     <div class="flex items-center gap-2 flex-shrink-0">
-                        <a href="/" class="flex items-center gap-2 hover:opacity-80 transition">
-                            <span class="text-2xl sm:text-3xl">🎓</span>
+                        <a href="/" class="flex items-center gap-2 hover:opacity-80 transition" aria-label="University Attendance System Home">
+                            <span class="text-2xl sm:text-3xl" role="img" aria-label="University">🎓</span>
                             <span class="text-sm sm:text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hidden sm:inline whitespace-nowrap">
                                 Attendance
                             </span>
@@ -196,8 +195,11 @@
                         <!-- Logout Button -->
                         <form id="logoutForm" method="post" asp-page="/Account/Logout" class="inline">
                             @Html.AntiForgeryToken()
-                            <button type="button" onclick="showLogoutConfirmation()" class="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white px-2 md:px-3 py-2 rounded text-xs md:text-sm font-medium transition whitespace-nowrap">
-                                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button type="button" 
+                                    onclick="showLogoutConfirmation()" 
+                                    class="flex items-center justify-center bg-red-500 hover:bg-red-600 active:bg-red-700 text-white px-2 md:px-3 py-2 rounded text-xs md:text-sm font-medium transition-all shadow-sm hover:shadow whitespace-nowrap"
+                                    aria-label="Logout from system">
+                                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                 </svg>
                                 <span class="hidden md:inline ml-1">Logout</span>
@@ -205,8 +207,12 @@
                         </form>
 
                         <!-- Mobile Menu Button -->
-                        <button onclick="toggleMenu()" class="lg:hidden flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded transition">
-                            <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button onclick="toggleMenu()" 
+                                class="lg:hidden flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded transition"
+                                aria-label="Toggle navigation menu"
+                                aria-expanded="false"
+                                aria-controls="navMenu">
+                            <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                             </svg>
                             <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,24 +322,34 @@
     </footer>
 
     <!-- Logout Confirmation Modal -->
-    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" onclick="hideLogoutConfirmation(event)">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4 transform transition-all" onclick="event.stopPropagation()">
+    <div id="logoutModal" 
+         class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" 
+         onclick="hideLogoutConfirmation(event)"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="logoutModalTitle"
+         aria-describedby="logoutModalDesc">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 max-w-md w-full mx-4 transform transition-all" onclick="event.stopPropagation()">
             <div class="flex items-center gap-4 mb-4">
                 <div class="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Confirm Logout</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Are you sure you want to logout?</p>
+                    <h3 id="logoutModalTitle" class="text-lg font-semibold text-gray-900 dark:text-white">Confirm Logout</h3>
+                    <p id="logoutModalDesc" class="text-sm text-gray-500 dark:text-gray-400 mt-1">Are you sure you want to logout?</p>
                 </div>
             </div>
             <div class="flex gap-3 justify-end mt-6">
-                <button onclick="hideLogoutConfirmation()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
+                <button onclick="hideLogoutConfirmation()" 
+                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                        aria-label="Cancel logout">
                     Cancel
                 </button>
-                <button onclick="confirmLogout()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition font-medium">
+                <button onclick="confirmLogout()" 
+                        class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 active:bg-red-700 transition-colors font-medium shadow-sm hover:shadow"
+                        aria-label="Confirm and logout">
                     Yes, Logout
                 </button>
             </div>
@@ -379,7 +395,84 @@
         document.querySelectorAll('#navMenu a').forEach(link => {
             link.addEventListener('click', toggleMenu);
         });
+
+        // Global Toast Notification System
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            const icons = {
+                success: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>',
+                error: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>',
+                warning: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>',
+                info: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>'
+            };
+            
+            toast.className = `fixed top-4 right-4 ${bgColors[type]} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 z-[9999] transform transition-all duration-300 translate-x-0 opacity-100`;
+            toast.style.animation = 'slideInRight 0.3s ease-out';
+            toast.innerHTML = `
+                ${icons[type]}
+                <span class="font-medium">${message}</span>
+                <button onclick="this.parentElement.remove()" class="ml-4 hover:bg-white hover:bg-opacity-20 rounded p-1 transition">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(400px)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // Add slideInRight animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Show TempData notifications as toasts
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>showToast('@TempData["SuccessMessage"]', 'success');</text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>showToast('@TempData["ErrorMessage"]', 'error');</text>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>showToast('@TempData["WarningMessage"]', 'warning');</text>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>showToast('@TempData["InfoMessage"]', 'info');</text>
+        }
     </script>
+
+    <!-- Form Validation -->
+    <script src="~/js/form-validation.js"></script>
+
+    <!-- Loading Utilities -->
+    <script src="~/js/loading-utils.js"></script>
 
     <!-- AJAX Forms Handler -->
     <script src="~/js/ajax-forms.js"></script>

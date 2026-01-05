@@ -8,18 +8,22 @@ html {
   }
 }
 
-/* Remove focus rings globally */
-*, *:focus, *:active, *:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
+/* Improved focus states for accessibility (WCAG 2.1 compliant) */
+*:focus-visible {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
 
-/* Tailwind focus ring removal */
-input:focus, select:focus, textarea:focus, button:focus {
-  --tw-ring-shadow: none !important;
-  --tw-ring-color: transparent !important;
-  box-shadow: none !important;
-  outline: none !important;
+button:focus-visible, a:focus-visible {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 0px !important;
+  border-color: #3b82f6 !important;
 }
 
 html {
@@ -29,4 +33,36 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+/* Better color contrast ratios for accessibility */
+.text-gray-600 {
+  color: #4b5563 !important; /* Darker for better contrast */
+}
+
+.text-gray-500 {
+  color: #6b7280 !important; /* Improved readability */
+}
+
+/* Enhanced button states */
+button:active, .btn:active {
+  transform: scale(0.98);
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
